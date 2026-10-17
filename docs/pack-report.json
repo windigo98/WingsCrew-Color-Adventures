@@ -1,0 +1,495 @@
+{
+  "generatedAt": "2026-10-17T08:13:05.344Z",
+  "pictures": [
+    {
+      "id": "sunny-dragon",
+      "pack": "starter",
+      "tier": "little",
+      "regions": 24,
+      "colors": 14,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 25600,
+        "regions": 24
+      },
+      "ms": 116
+    },
+    {
+      "id": "fantasy-castle",
+      "pack": "starter",
+      "tier": "little",
+      "regions": 23,
+      "colors": 13,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 25600,
+        "regions": 23
+      },
+      "ms": 78
+    },
+    {
+      "id": "meadow-fox",
+      "pack": "starter",
+      "tier": "big",
+      "regions": 167,
+      "colors": 15,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 167
+      },
+      "ms": 211
+    },
+    {
+      "id": "forest-walk",
+      "pack": "starter",
+      "tier": "big",
+      "regions": 202,
+      "colors": 12,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 202
+      },
+      "ms": 179
+    },
+    {
+      "id": "ocean-fish",
+      "pack": "starter",
+      "tier": "big",
+      "regions": 179,
+      "colors": 13,
+      "coverage": {
+        "miss": 0,
+        "multi": 1,
+        "total": 19600,
+        "regions": 179
+      },
+      "ms": 192
+    },
+    {
+      "id": "baby-phoenix",
+      "pack": "creatures",
+      "tier": "little",
+      "regions": 13,
+      "colors": 9,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 25600,
+        "regions": 13
+      },
+      "ms": 62
+    },
+    {
+      "id": "unicorn-meadow",
+      "pack": "creatures",
+      "tier": "little",
+      "regions": 18,
+      "colors": 10,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 25600,
+        "regions": 18
+      },
+      "ms": 41
+    },
+    {
+      "id": "sea-serpent",
+      "pack": "creatures",
+      "tier": "big",
+      "regions": 180,
+      "colors": 9,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 180
+      },
+      "ms": 156
+    },
+    {
+      "id": "griffin-perch",
+      "pack": "creatures",
+      "tier": "big",
+      "regions": 207,
+      "colors": 11,
+      "coverage": {
+        "miss": 0,
+        "multi": 4,
+        "total": 19600,
+        "regions": 207
+      },
+      "ms": 145
+    },
+    {
+      "id": "night-owl",
+      "pack": "creatures",
+      "tier": "big",
+      "regions": 166,
+      "colors": 11,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 166
+      },
+      "ms": 149
+    },
+    {
+      "id": "phoenix-rise",
+      "pack": "creatures",
+      "tier": "adult",
+      "regions": 1311,
+      "colors": 10,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 1311
+      },
+      "ms": 461
+    },
+    {
+      "id": "dragon-queen",
+      "pack": "creatures",
+      "tier": "adult",
+      "regions": 2113,
+      "colors": 14,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 2113
+      },
+      "ms": 557
+    },
+    {
+      "id": "celestial-wolf",
+      "pack": "creatures",
+      "tier": "adult",
+      "regions": 1607,
+      "colors": 11,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 1607
+      },
+      "ms": 483
+    },
+    {
+      "id": "jolly-tree",
+      "pack": "christmas",
+      "tier": "little",
+      "regions": 14,
+      "colors": 9,
+      "coverage": {
+        "miss": 0,
+        "multi": 2,
+        "total": 25600,
+        "regions": 14
+      },
+      "ms": 33
+    },
+    {
+      "id": "snow-friend",
+      "pack": "christmas",
+      "tier": "little",
+      "regions": 13,
+      "colors": 7,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 25600,
+        "regions": 13
+      },
+      "ms": 42
+    },
+    {
+      "id": "reindeer-flight",
+      "pack": "christmas",
+      "tier": "big",
+      "regions": 157,
+      "colors": 9,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 157
+      },
+      "ms": 136
+    },
+    {
+      "id": "cozy-wreath",
+      "pack": "christmas",
+      "tier": "big",
+      "regions": 148,
+      "colors": 10,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 148
+      },
+      "ms": 120
+    },
+    {
+      "id": "sleigh-ride",
+      "pack": "christmas",
+      "tier": "big",
+      "regions": 219,
+      "colors": 11,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 219
+      },
+      "ms": 174
+    },
+    {
+      "id": "pumpkin-patch",
+      "pack": "halloween",
+      "tier": "little",
+      "regions": 16,
+      "colors": 8,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 25600,
+        "regions": 16
+      },
+      "ms": 32
+    },
+    {
+      "id": "friendly-ghost",
+      "pack": "halloween",
+      "tier": "little",
+      "regions": 11,
+      "colors": 7,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 25600,
+        "regions": 11
+      },
+      "ms": 28
+    },
+    {
+      "id": "black-cat",
+      "pack": "halloween",
+      "tier": "big",
+      "regions": 146,
+      "colors": 9,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 146
+      },
+      "ms": 136
+    },
+    {
+      "id": "haunted-house",
+      "pack": "halloween",
+      "tier": "big",
+      "regions": 207,
+      "colors": 11,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 207
+      },
+      "ms": 164
+    },
+    {
+      "id": "moon-bats",
+      "pack": "halloween",
+      "tier": "big",
+      "regions": 160,
+      "colors": 7,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 160
+      },
+      "ms": 140
+    },
+    {
+      "id": "skull-garden",
+      "pack": "halloween",
+      "tier": "adult",
+      "regions": 1406,
+      "colors": 9,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 1406
+      },
+      "ms": 441
+    },
+    {
+      "id": "garden-mandala",
+      "pack": "starter",
+      "tier": "adult",
+      "regions": 1244,
+      "colors": 8,
+      "coverage": {
+        "miss": 2,
+        "multi": 2,
+        "total": 14400,
+        "regions": 1244
+      },
+      "ms": 86
+    },
+    {
+      "id": "lotus-dawn",
+      "pack": "mandalas",
+      "tier": "adult",
+      "regions": 1669,
+      "colors": 10,
+      "coverage": {
+        "miss": 5,
+        "multi": 1,
+        "total": 14400,
+        "regions": 1669
+      },
+      "ms": 95
+    },
+    {
+      "id": "star-gate",
+      "pack": "mandalas",
+      "tier": "adult",
+      "regions": 1854,
+      "colors": 8,
+      "coverage": {
+        "miss": 3,
+        "multi": 0,
+        "total": 14400,
+        "regions": 1854
+      },
+      "ms": 103
+    },
+    {
+      "id": "sunburst-gold",
+      "pack": "mandalas",
+      "tier": "adult",
+      "regions": 1650,
+      "colors": 8,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 14400,
+        "regions": 1650
+      },
+      "ms": 87
+    },
+    {
+      "id": "indigo-kaleido",
+      "pack": "mandalas",
+      "tier": "adult",
+      "regions": 2310,
+      "colors": 8,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 14400,
+        "regions": 2310
+      },
+      "ms": 118
+    },
+    {
+      "id": "rose-window",
+      "pack": "mandalas",
+      "tier": "adult",
+      "regions": 2466,
+      "colors": 9,
+      "coverage": {
+        "miss": 12,
+        "multi": 0,
+        "total": 14400,
+        "regions": 2466
+      },
+      "ms": 126
+    },
+    {
+      "id": "ocean-spiral",
+      "pack": "mandalas",
+      "tier": "adult",
+      "regions": 2060,
+      "colors": 8,
+      "coverage": {
+        "miss": 8,
+        "multi": 0,
+        "total": 14400,
+        "regions": 2060
+      },
+      "ms": 108
+    },
+    {
+      "id": "ember-geometry",
+      "pack": "mandalas",
+      "tier": "adult",
+      "regions": 2616,
+      "colors": 8,
+      "coverage": {
+        "miss": 5,
+        "multi": 0,
+        "total": 14400,
+        "regions": 2616
+      },
+      "ms": 133
+    },
+    {
+      "id": "moon-petal",
+      "pack": "mandalas",
+      "tier": "big",
+      "regions": 196,
+      "colors": 7,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 14400,
+        "regions": 196
+      },
+      "ms": 23
+    },
+    {
+      "id": "ornament-mandala",
+      "pack": "christmas",
+      "tier": "adult",
+      "regions": 1309,
+      "colors": 7,
+      "coverage": {
+        "miss": 6,
+        "multi": 0,
+        "total": 14400,
+        "regions": 1309
+      },
+      "ms": 77
+    },
+    {
+      "id": "skull-mandala",
+      "pack": "halloween",
+      "tier": "adult",
+      "regions": 1410,
+      "colors": 7,
+      "coverage": {
+        "miss": 0,
+        "multi": 1,
+        "total": 14400,
+        "regions": 1410
+      },
+      "ms": 80
+    }
+  ]
+}

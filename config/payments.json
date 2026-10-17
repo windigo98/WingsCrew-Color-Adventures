@@ -1,0 +1,77 @@
+{
+  "testMode": true,
+  "currency": "USD",
+  "note": "TEST MODE shows a simulated checkout and no real charge. Set testMode to false only after each payhipUrl is a real Payhip product link. The app never sees card numbers. Prices are one-time.",
+  "products": [
+    {
+      "id": "full-unlock",
+      "name": "Full Unlock",
+      "price": 4.99,
+      "blurb": "All four launch packs and photo-to-puzzle, on this device, forever.",
+      "unlocks": ["creatures", "mandalas", "christmas", "halloween", "photo", "full-unlock"],
+      "payhipUrl": "https://payhip.com/TODO/wcca-full-unlock",
+      "prefix": "WCCA-FULL",
+      "testCode": "WCCA-FULL-TEST-DEMO-4K7Q"
+    },
+    {
+      "id": "creatures",
+      "name": "Fantastical Creatures",
+      "price": 2.49,
+      "blurb": "Eight creature pages, including intricate adult pictures.",
+      "unlocks": ["creatures"],
+      "payhipUrl": "https://payhip.com/TODO/wcca-creatures",
+      "prefix": "WCCA-CREA",
+      "testCode": "WCCA-CREA-TEST-DEMO-8M2P"
+    },
+    {
+      "id": "mandalas",
+      "name": "Mandalas & Patterns",
+      "price": 2.99,
+      "blurb": "Eight pattern pages, most of them adult-intricate.",
+      "unlocks": ["mandalas"],
+      "payhipUrl": "https://payhip.com/TODO/wcca-mandalas",
+      "prefix": "WCCA-MAND",
+      "testCode": "WCCA-MAND-TEST-DEMO-5R9T"
+    },
+    {
+      "id": "christmas",
+      "name": "Christmas",
+      "price": 1.99,
+      "blurb": "Six winter pages, from a chunky tree to an ornament mandala.",
+      "unlocks": ["christmas"],
+      "payhipUrl": "https://payhip.com/TODO/wcca-christmas",
+      "prefix": "WCCA-XMAS",
+      "testCode": "WCCA-XMAS-TEST-DEMO-3W6H"
+    },
+    {
+      "id": "halloween",
+      "name": "Halloween",
+      "price": 1.99,
+      "blurb": "Six autumn pages, friendly enough for little kids.",
+      "unlocks": ["halloween"],
+      "payhipUrl": "https://payhip.com/TODO/wcca-halloween",
+      "prefix": "WCCA-HALL",
+      "testCode": "WCCA-HALL-TEST-DEMO-7N4C"
+    },
+    {
+      "id": "bundle-story",
+      "name": "Storybook Bundle",
+      "price": 5.99,
+      "blurb": "Three packs together: Creatures, Christmas, and Halloween.",
+      "unlocks": ["creatures", "christmas", "halloween", "bundle-story"],
+      "payhipUrl": "https://payhip.com/TODO/wcca-storybook-bundle",
+      "prefix": "WCCA-BND3",
+      "testCode": "WCCA-BND3-TEST-DEMO-2Y8F"
+    },
+    {
+      "id": "all-future",
+      "name": "All Future Packs",
+      "price": 16.99,
+      "blurb": "Every pack now and every pack added later, including photo-to-puzzle.",
+      "unlocks": ["all-future", "photo", "creatures", "mandalas", "christmas", "halloween"],
+      "payhipUrl": "https://payhip.com/TODO/wcca-all-future-packs",
+      "prefix": "WCCA-PASS",
+      "testCode": "WCCA-PASS-TEST-DEMO-6L1V"
+    }
+  ]
+}

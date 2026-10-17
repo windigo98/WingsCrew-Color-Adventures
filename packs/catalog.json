@@ -1,0 +1,405 @@
+{
+  "name": "WingsCrew Color Adventures",
+  "packs": [
+    {
+      "id": "starter",
+      "title": "Starter",
+      "free": true,
+      "productId": null,
+      "tagline": "Six adventures to try, on the house.",
+      "blurb": "A friendly dragon, a castle, a fox, a forest, a koi, and a garden mandala.",
+      "pictures": [
+        {
+          "id": "sunny-dragon",
+          "title": "Sunny Dragon",
+          "tier": "little",
+          "regions": 24,
+          "colors": 14,
+          "file": "packs/starter/sunny-dragon.json",
+          "preview": "packs/starter/previews/sunny-dragon.png",
+          "bytes": 6769
+        },
+        {
+          "id": "fantasy-castle",
+          "title": "Fantasy Castle",
+          "tier": "little",
+          "regions": 23,
+          "colors": 13,
+          "file": "packs/starter/fantasy-castle.json",
+          "preview": "packs/starter/previews/fantasy-castle.png",
+          "bytes": 5297
+        },
+        {
+          "id": "meadow-fox",
+          "title": "Meadow Fox",
+          "tier": "big",
+          "regions": 167,
+          "colors": 15,
+          "file": "packs/starter/meadow-fox.json",
+          "preview": "packs/starter/previews/meadow-fox.png",
+          "bytes": 35576
+        },
+        {
+          "id": "forest-walk",
+          "title": "Forest Walk",
+          "tier": "big",
+          "regions": 202,
+          "colors": 12,
+          "file": "packs/starter/forest-walk.json",
+          "preview": "packs/starter/previews/forest-walk.png",
+          "bytes": 36704
+        },
+        {
+          "id": "ocean-fish",
+          "title": "Ocean Fish",
+          "tier": "big",
+          "regions": 179,
+          "colors": 13,
+          "file": "packs/starter/ocean-fish.json",
+          "preview": "packs/starter/previews/ocean-fish.png",
+          "bytes": 34672
+        },
+        {
+          "id": "garden-mandala",
+          "title": "Garden Mandala",
+          "tier": "adult",
+          "regions": 1244,
+          "colors": 8,
+          "file": "packs/starter/garden-mandala.json",
+          "preview": "packs/starter/previews/garden-mandala.png",
+          "bytes": 109052
+        }
+      ]
+    },
+    {
+      "id": "creatures",
+      "title": "Fantastical Creatures",
+      "free": false,
+      "productId": "creatures",
+      "tagline": "Beasts, birds, and beings from the storybook sky.",
+      "blurb": "Phoenixes, a unicorn, a sea serpent, a griffin, an owl, and intricate adult pages.",
+      "pictures": [
+        {
+          "id": "baby-phoenix",
+          "title": "Baby Phoenix",
+          "tier": "little",
+          "regions": 13,
+          "colors": 9,
+          "file": "packs/creatures/baby-phoenix.json",
+          "preview": "packs/creatures/previews/baby-phoenix.png",
+          "bytes": 4991
+        },
+        {
+          "id": "unicorn-meadow",
+          "title": "Unicorn Meadow",
+          "tier": "little",
+          "regions": 18,
+          "colors": 10,
+          "file": "packs/creatures/unicorn-meadow.json",
+          "preview": "packs/creatures/previews/unicorn-meadow.png",
+          "bytes": 6835
+        },
+        {
+          "id": "sea-serpent",
+          "title": "Sea Serpent",
+          "tier": "big",
+          "regions": 180,
+          "colors": 9,
+          "file": "packs/creatures/sea-serpent.json",
+          "preview": "packs/creatures/previews/sea-serpent.png",
+          "bytes": 49187
+        },
+        {
+          "id": "griffin-perch",
+          "title": "Griffin Perch",
+          "tier": "big",
+          "regions": 207,
+          "colors": 11,
+          "file": "packs/creatures/griffin-perch.json",
+          "preview": "packs/creatures/previews/griffin-perch.png",
+          "bytes": 50367
+        },
+        {
+          "id": "night-owl",
+          "title": "Night Owl",
+          "tier": "big",
+          "regions": 166,
+          "colors": 11,
+          "file": "packs/creatures/night-owl.json",
+          "preview": "packs/creatures/previews/night-owl.png",
+          "bytes": 41079
+        },
+        {
+          "id": "phoenix-rise",
+          "title": "Phoenix Rise",
+          "tier": "adult",
+          "regions": 1311,
+          "colors": 10,
+          "file": "packs/creatures/phoenix-rise.json",
+          "preview": "packs/creatures/previews/phoenix-rise.png",
+          "bytes": 299187
+        },
+        {
+          "id": "dragon-queen",
+          "title": "Dragon Queen",
+          "tier": "adult",
+          "regions": 2113,
+          "colors": 14,
+          "file": "packs/creatures/dragon-queen.json",
+          "preview": "packs/creatures/previews/dragon-queen.png",
+          "bytes": 435335
+        },
+        {
+          "id": "celestial-wolf",
+          "title": "Celestial Wolf",
+          "tier": "adult",
+          "regions": 1607,
+          "colors": 11,
+          "file": "packs/creatures/celestial-wolf.json",
+          "preview": "packs/creatures/previews/celestial-wolf.png",
+          "bytes": 337707
+        }
+      ]
+    },
+    {
+      "id": "mandalas",
+      "title": "Mandalas & Patterns",
+      "free": false,
+      "productId": "mandalas",
+      "tagline": "Slow, intricate patterns for a quiet hour.",
+      "blurb": "Lotus, star, sunburst, rose window, and other full-page patterns.",
+      "pictures": [
+        {
+          "id": "lotus-dawn",
+          "title": "Lotus Dawn",
+          "tier": "adult",
+          "regions": 1669,
+          "colors": 10,
+          "file": "packs/mandalas/lotus-dawn.json",
+          "preview": "packs/mandalas/previews/lotus-dawn.png",
+          "bytes": 195254
+        },
+        {
+          "id": "star-gate",
+          "title": "Star Gate",
+          "tier": "adult",
+          "regions": 1854,
+          "colors": 8,
+          "file": "packs/mandalas/star-gate.json",
+          "preview": "packs/mandalas/previews/star-gate.png",
+          "bytes": 217846
+        },
+        {
+          "id": "sunburst-gold",
+          "title": "Sunburst",
+          "tier": "adult",
+          "regions": 1650,
+          "colors": 8,
+          "file": "packs/mandalas/sunburst-gold.json",
+          "preview": "packs/mandalas/previews/sunburst-gold.png",
+          "bytes": 190054
+        },
+        {
+          "id": "indigo-kaleido",
+          "title": "Indigo Kaleido",
+          "tier": "adult",
+          "regions": 2310,
+          "colors": 8,
+          "file": "packs/mandalas/indigo-kaleido.json",
+          "preview": "packs/mandalas/previews/indigo-kaleido.png",
+          "bytes": 266370
+        },
+        {
+          "id": "rose-window",
+          "title": "Rose Window",
+          "tier": "adult",
+          "regions": 2466,
+          "colors": 9,
+          "file": "packs/mandalas/rose-window.json",
+          "preview": "packs/mandalas/previews/rose-window.png",
+          "bytes": 283834
+        },
+        {
+          "id": "ocean-spiral",
+          "title": "Ocean Spiral",
+          "tier": "adult",
+          "regions": 2060,
+          "colors": 8,
+          "file": "packs/mandalas/ocean-spiral.json",
+          "preview": "packs/mandalas/previews/ocean-spiral.png",
+          "bytes": 237558
+        },
+        {
+          "id": "ember-geometry",
+          "title": "Ember Geometry",
+          "tier": "adult",
+          "regions": 2616,
+          "colors": 8,
+          "file": "packs/mandalas/ember-geometry.json",
+          "preview": "packs/mandalas/previews/ember-geometry.png",
+          "bytes": 301974
+        },
+        {
+          "id": "moon-petal",
+          "title": "Moon Petal",
+          "tier": "big",
+          "regions": 196,
+          "colors": 7,
+          "file": "packs/mandalas/moon-petal.json",
+          "preview": "packs/mandalas/previews/moon-petal.png",
+          "bytes": 26382
+        }
+      ]
+    },
+    {
+      "id": "christmas",
+      "title": "Christmas",
+      "free": false,
+      "productId": "christmas",
+      "tagline": "Snow, sleighs, and candle-warm colors.",
+      "blurb": "Trees, snow friends, reindeer, wreaths, and a sleigh, plus an ornament mandala.",
+      "pictures": [
+        {
+          "id": "jolly-tree",
+          "title": "Jolly Tree",
+          "tier": "little",
+          "regions": 14,
+          "colors": 9,
+          "file": "packs/christmas/jolly-tree.json",
+          "preview": "packs/christmas/previews/jolly-tree.png",
+          "bytes": 5619
+        },
+        {
+          "id": "snow-friend",
+          "title": "Snow Friend",
+          "tier": "little",
+          "regions": 13,
+          "colors": 7,
+          "file": "packs/christmas/snow-friend.json",
+          "preview": "packs/christmas/previews/snow-friend.png",
+          "bytes": 5247
+        },
+        {
+          "id": "reindeer-flight",
+          "title": "Reindeer Flight",
+          "tier": "big",
+          "regions": 157,
+          "colors": 9,
+          "file": "packs/christmas/reindeer-flight.json",
+          "preview": "packs/christmas/previews/reindeer-flight.png",
+          "bytes": 39883
+        },
+        {
+          "id": "cozy-wreath",
+          "title": "Cozy Wreath",
+          "tier": "big",
+          "regions": 148,
+          "colors": 10,
+          "file": "packs/christmas/cozy-wreath.json",
+          "preview": "packs/christmas/previews/cozy-wreath.png",
+          "bytes": 36047
+        },
+        {
+          "id": "sleigh-ride",
+          "title": "Sleigh Ride",
+          "tier": "big",
+          "regions": 219,
+          "colors": 11,
+          "file": "packs/christmas/sleigh-ride.json",
+          "preview": "packs/christmas/previews/sleigh-ride.png",
+          "bytes": 50079
+        },
+        {
+          "id": "ornament-mandala",
+          "title": "Ornament Mandala",
+          "tier": "adult",
+          "regions": 1309,
+          "colors": 7,
+          "file": "packs/christmas/ornament-mandala.json",
+          "preview": "packs/christmas/previews/ornament-mandala.png",
+          "bytes": 155835
+        }
+      ]
+    },
+    {
+      "id": "halloween",
+      "title": "Halloween",
+      "free": false,
+      "productId": "halloween",
+      "tagline": "Friendly frights and autumn evenings.",
+      "blurb": "Pumpkins, ghosts, a black cat, a haunted house, bats, and a skull mandala.",
+      "pictures": [
+        {
+          "id": "pumpkin-patch",
+          "title": "Pumpkin Patch",
+          "tier": "little",
+          "regions": 16,
+          "colors": 8,
+          "file": "packs/halloween/pumpkin-patch.json",
+          "preview": "packs/halloween/previews/pumpkin-patch.png",
+          "bytes": 5627
+        },
+        {
+          "id": "friendly-ghost",
+          "title": "Friendly Ghost",
+          "tier": "little",
+          "regions": 11,
+          "colors": 7,
+          "file": "packs/halloween/friendly-ghost.json",
+          "preview": "packs/halloween/previews/friendly-ghost.png",
+          "bytes": 4319
+        },
+        {
+          "id": "black-cat",
+          "title": "Black Cat",
+          "tier": "big",
+          "regions": 146,
+          "colors": 9,
+          "file": "packs/halloween/black-cat.json",
+          "preview": "packs/halloween/previews/black-cat.png",
+          "bytes": 36419
+        },
+        {
+          "id": "haunted-house",
+          "title": "Haunted House",
+          "tier": "big",
+          "regions": 207,
+          "colors": 11,
+          "file": "packs/halloween/haunted-house.json",
+          "preview": "packs/halloween/previews/haunted-house.png",
+          "bytes": 45795
+        },
+        {
+          "id": "moon-bats",
+          "title": "Moon Bats",
+          "tier": "big",
+          "regions": 160,
+          "colors": 7,
+          "file": "packs/halloween/moon-bats.json",
+          "preview": "packs/halloween/previews/moon-bats.png",
+          "bytes": 38523
+        },
+        {
+          "id": "skull-garden",
+          "title": "Skull Garden",
+          "tier": "adult",
+          "regions": 1406,
+          "colors": 9,
+          "file": "packs/halloween/skull-garden.json",
+          "preview": "packs/halloween/previews/skull-garden.png",
+          "bytes": 309035
+        },
+        {
+          "id": "skull-mandala",
+          "title": "Skull Mandala",
+          "tier": "adult",
+          "regions": 1410,
+          "colors": 7,
+          "file": "packs/halloween/skull-mandala.json",
+          "preview": "packs/halloween/previews/skull-mandala.png",
+          "bytes": 163827
+        }
+      ]
+    }
+  ]
+}

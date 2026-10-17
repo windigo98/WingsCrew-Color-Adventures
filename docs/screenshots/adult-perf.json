@@ -1,0 +1,11 @@
+{
+  "regions": 2113,
+  "loadMs": 153,
+  "panMs": 0.3,
+  "zoomMs": 0.2,
+  "vectorMs": 2,
+  "visibleAt6x": 96,
+  "cacheMs": 0.4,
+  "fillMs": 0.6,
+  "zoomRatio": 8
+}
