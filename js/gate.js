@@ -1,7 +1,31 @@
-/** A simple grown-up check before kids can save, share, or print. */
+/** A simple grown-up check before kids can save, share, print, or leave the app. */
+
+import { app } from "./state.js";
+
+/** Little Kids and Big Kids shelves. The choice sticks while Shop and Settings are open. */
+export function inKidsMode() {
+  return app.tierFilter === "little" || app.tierFilter === "big";
+}
+
+export function isExternalHref(href) {
+  if (!href) return false;
+  const raw = href.trim();
+  if (!raw || raw.startsWith("#")) return false;
+  if (/^(mailto|tel|sms):/i.test(raw)) return true;
+  try {
+    const url = new URL(raw, location.href);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return false;
+    return url.origin !== location.origin;
+  } catch {
+    return false;
+  }
+}
+
+let pending = null;
 
 export function parentGate() {
-  return new Promise((resolve) => {
+  if (pending) return pending;
+  pending = new Promise((resolve) => {
     const a = 2 + Math.floor(Math.random() * 8);
     const b = 2 + Math.floor(Math.random() * 7);
     const answer = a + b;
@@ -11,7 +35,7 @@ export function parentGate() {
     wrap.innerHTML = `
       <div class="modal" role="dialog" aria-modal="true" aria-labelledby="gate-title">
         <p class="eyebrow">Grown-ups</p>
-        <h2 id="gate-title">A grown-up can help save or print.</h2>
+        <h2 id="gate-title">A grown-up can help with this.</h2>
         <p>What is ${a} + ${b}?</p>
         <form id="gate-form">
           <input id="gate-answer" inputmode="numeric" autocomplete="off" aria-label="Answer">
@@ -29,6 +53,7 @@ export function parentGate() {
     let holdTimer = 0;
     const close = (ok) => {
       wrap.remove();
+      pending = null;
       resolve(ok);
     };
     wrap.querySelector("#gate-form").addEventListener("submit", (e) => {
@@ -50,4 +75,5 @@ export function parentGate() {
     hold.addEventListener("pointerup", stop);
     hold.addEventListener("pointerleave", stop);
   });
+  return pending;
 }

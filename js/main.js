@@ -5,6 +5,7 @@ import { openPlay, closePlay } from "./play.js";
 import { renderShop, renderHow, renderCheckout } from "./shop.js";
 import { renderPhoto } from "./photo.js";
 import { exportBackup, importBackup } from "./backup.js";
+import { inKidsMode, isExternalHref, parentGate } from "./gate.js";
 
 const screen = () => document.getElementById("screen");
 let cleanup = null;
@@ -153,10 +154,10 @@ async function renderHome(root) {
   root.innerHTML = `
     <section class="screen home">
       <div class="hero">
-        <img class="hero-logo" src="${asset("icons/logo.svg")}" alt="WingsCrew">
+        <img class="hero-logo" src="${asset("icons/logo.png")}" alt="WingsCrew">
         <div>
           <p class="eyebrow">WingsCrew studio</p>
-          <h1>Color Adventures</h1>
+          <h1>WingsCrew Color Adventures</h1>
           <p>Calm pages for little kids, big kids, and adults. No ads. Your photos never leave this device.</p>
         </div>
       </div>
@@ -249,7 +250,7 @@ function renderSettings(root) {
   const s = app.settings;
   root.innerHTML = `
     <section class="screen settings">
-      <img class="hero-logo small" src="${asset("icons/logo.svg")}" alt="WingsCrew">
+      <img class="hero-logo small" src="${asset("icons/logo.png")}" alt="WingsCrew">
       <h1>Settings</h1>
       <label class="check"><input type="checkbox" data-set="penOnly" ${s.penOnly ? "checked" : ""}> Pen-only fill. Fingers only pan and zoom.</label>
       <label class="check"><input type="checkbox" data-set="shade" ${s.shade ? "checked" : ""}> Pen shading. Pressure darkens a filled region.</label>
@@ -293,6 +294,32 @@ function renderSettings(root) {
     }
   });
 }
+
+let lettingThrough = false;
+document.addEventListener("click", async (event) => {
+  if (lettingThrough) return;
+  const link = event.target.closest("a[href]");
+  if (!link || !inKidsMode()) return;
+  const href = link.getAttribute("href");
+  if (!isExternalHref(href)) return;
+  event.preventDefault();
+  event.stopPropagation();
+  if (!(await parentGate())) return;
+  lettingThrough = true;
+  try {
+    if (link.target === "_blank") {
+      const opened = document.createElement("a");
+      opened.href = link.href;
+      opened.target = "_blank";
+      opened.rel = "noopener";
+      opened.click();
+    } else {
+      location.href = link.href;
+    }
+  } finally {
+    lettingThrough = false;
+  }
+}, true);
 
 document.getElementById("nav-back").addEventListener("click", () => {
   if (location.hash.startsWith("#/play/")) location.hash = "#/";

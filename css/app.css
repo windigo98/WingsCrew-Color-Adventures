@@ -69,10 +69,11 @@ img { max-width: 100%; }
   letter-spacing: 0.01em;
 }
 .brand img {
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
-  background: #f4efe4;
+  width: auto;
+  height: 52px;
+  border-radius: 0;
+  background: transparent;
+  object-fit: contain;
 }
 .top nav { margin-left: auto; display: flex; gap: 0.5rem; align-items: center; }
 .top nav a { text-decoration: none; font-weight: 650; }
@@ -89,8 +90,15 @@ img { max-width: 100%; }
 .site-foot p { margin: 0.2rem 0; }
 
 .hero { display: flex; gap: 1rem; align-items: center; margin: 0.4rem 0 1rem; }
-.hero-logo { width: min(220px, 38vw); height: auto; background: #f4efe4; border-radius: 24px; }
-.hero-logo.small { width: 140px; }
+.hero-logo {
+  width: auto;
+  height: min(240px, 34vh);
+  max-width: 100%;
+  background: transparent;
+  border-radius: 0;
+  object-fit: contain;
+}
+.hero-logo.small { height: 128px; width: auto; }
 .eyebrow { letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.75rem; color: var(--orange); font-weight: 700; margin: 0 0 0.2rem; }
 h1 { font-size: clamp(1.8rem, 3vw, 2.6rem); line-height: 1.05; margin: 0 0 0.4rem; }
 h2 { margin: 1.3rem 0 0.5rem; font-size: 1.25rem; }

@@ -36,7 +36,7 @@ This environment could not turn Pages on (the GitHub API for this repo declined 
 - Numbers sit inside regions and hide when they would be smaller than about 10px.
 - A stylus (`pointerType: "pen"`) fills precisely. A large touch, or a finger while the pen is hovering, is ignored. Settings can switch to pen-only fill (fingers only pan and zoom) and pressure shading.
 - Progress autosaves in IndexedDB per picture. Settings can export and import a `.wingscrew.json` backup.
-- Finished pages can be saved as PNG or printed. Little Kids and Big Kids pages ask a grown-up (a short sum, or hold to confirm) before saving or printing.
+- Finished pages can be saved as PNG or printed. Little Kids and Big Kids pages ask a grown-up (a short sum, or hold to confirm) before saving or printing. Choosing the Little Kids or Big Kids shelf also asks before a feedback email, the tip link, a Buy button, or a backup export. Adults and All do not.
 - Photo-to-puzzle runs entirely in a web worker on the device: palette reduction, regions, outlines, and number placement. Coloring a photo page needs Full Unlock or All Future Packs. The preview step does not.
 - There are no ads, accounts, analytics, or third-party trackers.
 
@@ -160,7 +160,7 @@ npm test
 
 ## Brand and contact
 
-The header and app icons use the WingsCrew feather. The original logo file was not stored in the repo, so `icons/logo.svg` was drawn to match the orange feather, navy band, and cream **WingsCrew** lettering, then rasterized to the PWA icons (`node tools/make-icons.mjs`).
+The header uses the official WingsCrew feather (`icons/logo.png`, transparent). Home-screen and favicon files are the official rasters from [windigo98/WingsCrew `assets/brand`](https://github.com/windigo98/WingsCrew/tree/main/assets/brand). `node tools/make-icons.mjs` only builds `icons/icon-maskable.png`, with the feather inside the maskable safe circle on the same dark ground as `icon-512.png`.
 
 © 2026 WingsCrew. All rights reserved. See `LICENSE`.
 
