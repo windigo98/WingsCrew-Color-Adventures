@@ -66,11 +66,33 @@ test.beforeAll(() => {
 
 test("home, coloring, zoom, pan, undo, pen, and palm rejection", async ({ page }, testInfo) => {
   await page.goto("./");
-  await expect(page.locator("h1")).toHaveText("Color Adventures");
+  await expect(page.locator("h1")).toHaveText("WingsCrew Color Adventures");
   await expect(page.getByText("Sunny Dragon")).toBeVisible();
   await expect(page.locator("footer")).toContainText("© 2026 WingsCrew");
+  await page.waitForFunction(() => {
+    const img = document.querySelector("header.top img");
+    return img && img.complete && img.naturalWidth > 0;
+  });
   if (testInfo.project.name === "tablet-chromium") {
+    await page.locator("header.top").screenshot({ path: path.join(shotDir, "header.png") });
     await page.screenshot({ path: path.join(shotDir, "tablet-home.png"), fullPage: true });
+    await page.evaluate(() => {
+      const overlay = document.createElement("div");
+      overlay.id = "icon-shot";
+      overlay.innerHTML = `<div class="tile"><img src="icons/apple-touch-icon.png" alt="" width="120" height="120"><div>WingsCrew</div></div>`;
+      overlay.style.cssText = "position:fixed;inset:0;z-index:40;background:linear-gradient(180deg,#7eb6e0,#c5dff3);display:flex;align-items:center;justify-content:center;";
+      const tile = overlay.querySelector(".tile");
+      tile.style.cssText = "text-align:center;color:#fff;font:500 13px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;text-shadow:0 1px 2px rgba(0,0,0,.35);";
+      const img = overlay.querySelector("img");
+      img.style.cssText = "width:120px;height:120px;border-radius:26px;box-shadow:0 10px 24px rgba(0,0,0,.28);display:block;";
+      document.body.appendChild(overlay);
+    });
+    await page.waitForFunction(() => {
+      const img = document.querySelector("#icon-shot img");
+      return img && img.complete && img.naturalWidth > 0;
+    });
+    await page.locator("#icon-shot").screenshot({ path: path.join(shotDir, "home-screen-icon.png") });
+    await page.evaluate(() => document.getElementById("icon-shot")?.remove());
   }
   if (testInfo.project.name === "phone-chromium") {
     await page.screenshot({ path: path.join(shotDir, "phone-home.png"), fullPage: false });
@@ -304,8 +326,54 @@ test("test-mode purchase, photo page, offline reload, and adult performance", as
   await page.evaluate(() => {
     location.hash = "#/";
   });
-  await expect(page.locator("h1")).toHaveText("Color Adventures");
+  await expect(page.locator("h1")).toHaveText("WingsCrew Color Adventures");
   await page.reload();
-  await expect(page.locator("h1")).toHaveText("Color Adventures");
+  await expect(page.locator("h1")).toHaveText("WingsCrew Color Adventures");
   await page.context().setOffline(false);
+});
+
+test("little kids shelf asks a grown-up before outside links and buying", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "tablet-chromium", "gate check runs once");
+  await page.goto("./");
+  await page.getByRole("tab", { name: "Little Kids" }).click();
+  await page.getByRole("link", { name: "Tip on Cash App" }).click();
+  await expect(page.locator("#gate-title")).toBeVisible();
+  await page.getByRole("button", { name: "Not now" }).click();
+  await expect(page.locator("#gate-title")).toHaveCount(0);
+  await expect(page.locator("h1")).toHaveText("WingsCrew Color Adventures");
+
+  await page.getByRole("link", { name: "Feedback" }).click();
+  await expect(page.locator("#gate-title")).toBeVisible();
+  await page.getByRole("button", { name: "Not now" }).click();
+
+  await page.locator("#nav-shop").click();
+  await page.getByRole("button", { name: "Buy" }).first().click();
+  await expect(page.locator("#gate-title")).toBeVisible();
+  await expect(page.locator("h1")).toHaveText("Try free. Pay once.");
+  await page.getByRole("button", { name: "Not now" }).click();
+
+  await page.getByRole("button", { name: "Buy" }).first().click();
+  const question = await page.locator(".modal p").nth(1).textContent();
+  const match = question.match(/(\d+) \+ (\d+)/);
+  await page.locator("#gate-answer").fill(String(Number(match[1]) + Number(match[2])));
+  await page.locator("#gate-form button[type=submit]").click();
+  await expect(page.locator("h1")).toHaveText("Five small steps. Pay once.");
+
+  await page.evaluate(() => {
+    location.hash = "#/play/sunny-dragon";
+  });
+  await page.waitForFunction(() => window.__WCCA && window.__WCCA.board && window.__WCCA.board.cssW > 100);
+  await page.evaluate(() => {
+    document.getElementById("complete").hidden = false;
+  });
+  await page.getByRole("button", { name: "Save PNG" }).click();
+  await expect(page.locator("#gate-title")).toBeVisible();
+  const saveQuestion = await page.locator(".modal p").nth(1).textContent();
+  const saveMatch = saveQuestion.match(/(\d+) \+ (\d+)/);
+  await page.locator("#gate-answer").fill(String(Number(saveMatch[1]) + Number(saveMatch[2])));
+  const downloadPromise = page.waitForEvent("download");
+  await page.locator("#gate-form button[type=submit]").click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toContain("sunny-dragon");
+  await expect(page.locator("#gate-title")).toHaveCount(0);
 });

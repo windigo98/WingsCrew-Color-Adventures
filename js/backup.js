@@ -1,8 +1,10 @@
 import { dumpAll, replaceAll, kvSet } from "./db.js";
 import { lookupCode, rememberUnlock } from "./unlock.js";
 import { app } from "./state.js";
+import { inKidsMode, parentGate } from "./gate.js";
 
 export async function exportBackup() {
+  if (inKidsMode() && !(await parentGate())) return;
   const data = await dumpAll();
   const file = {
     app: "wingscrew-color-adventures",

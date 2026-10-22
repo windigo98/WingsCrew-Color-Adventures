@@ -1,5 +1,8 @@
 import { app, asset } from "./state.js";
 import { lookupCode, rememberUnlock, hasAccess } from "./unlock.js";
+import { inKidsMode, parentGate } from "./gate.js";
+
+const BUY_CLEAR = "wcca-buy-cleared";
 
 function money(n) {
   return "$" + Number(n).toFixed(2);
@@ -96,9 +99,13 @@ function cardFor(product, isOwned, hero = false) {
 export function bindShopClicks(root) {
   if (root.dataset.shopBound) return;
   root.dataset.shopBound = "1";
-  root.addEventListener("click", (e) => {
+  root.addEventListener("click", async (e) => {
     const id = e.target.closest("[data-buy]")?.dataset.buy;
     if (!id) return;
+    if (inKidsMode()) {
+      if (!(await parentGate())) return;
+      sessionStorage.setItem(BUY_CLEAR, "1");
+    }
     if (!app.settings.seenHow) {
       sessionStorage.setItem("wcca-after-how", id);
       location.hash = "#/how";
@@ -108,14 +115,26 @@ export function bindShopClicks(root) {
   });
 }
 
-export function startPurchase(id) {
-  const product = productById(id);
-  if (!product) return;
+function openCheckout(id, product) {
   if (app.payments.testMode) {
     location.hash = "#/checkout/" + id;
     return;
   }
   window.open(product.payhipUrl, "_blank", "noopener");
+}
+
+export function startPurchase(id) {
+  const product = productById(id);
+  if (!product) return;
+  const cleared = sessionStorage.getItem(BUY_CLEAR) === "1";
+  sessionStorage.removeItem(BUY_CLEAR);
+  if (inKidsMode() && !cleared) {
+    parentGate().then((ok) => {
+      if (ok) openCheckout(id, product);
+    });
+    return;
+  }
+  openCheckout(id, product);
 }
 
 export function renderHow(root) {
@@ -155,8 +174,15 @@ export function renderCheckout(root, productId) {
   }
   if (!app.payments.testMode) {
     root.innerHTML = `<section class="screen"><p>Opening Payhip…</p></section>`;
-    window.open(product.payhipUrl, "_blank", "noopener");
-    location.hash = "#/shop";
+    const leave = async () => {
+      if (inKidsMode() && !(await parentGate())) {
+        location.hash = "#/shop";
+        return;
+      }
+      window.open(product.payhipUrl, "_blank", "noopener");
+      location.hash = "#/shop";
+    };
+    leave();
     return;
   }
   root.innerHTML = `
