@@ -1,4 +1,4 @@
-const CACHE = "wcca-v1";
+const CACHE = "wcca-v2";
 
 const SHELL = [
   "./",
@@ -19,11 +19,12 @@ const SHELL = [
   "./js/backup.js",
   "./js/vectorize.js",
   "./js/geom.js",
-  "./icons/logo.svg",
+  "./icons/logo.png",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/icon-maskable.png",
   "./icons/apple-touch-icon.png",
+  "./favicon.ico",
   "./config/payments.json",
   "./config/pack-keys.json",
   "./data/unlock-hashes.json",
