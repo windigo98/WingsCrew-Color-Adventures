@@ -289,6 +289,22 @@ test("test-mode purchase, photo page, offline reload, and adult performance", as
       board._paintCache();
       cacheTimes.push(performance.now() - t0);
     }
+    board.patterns = true;
+    const patternStart = performance.now();
+    board._rebuildPatterns();
+    const patternRebuildMs = performance.now() - patternStart;
+    board.gesturing = true;
+    board.fit();
+    board.draw();
+    const patternPan = [];
+    for (let i = 0; i < 12; i++) {
+      board.panX -= 4;
+      board.clampPan();
+      const t0 = performance.now();
+      board.draw();
+      patternPan.push(performance.now() - t0);
+    }
+    board.patterns = false;
     for (const r of board.regions) board.filled[r.i] = 1;
     board._paintCache();
     board.highlight = false;
@@ -309,11 +325,15 @@ test("test-mode purchase, photo page, offline reload, and adult performance", as
       cacheMs: Math.round((cacheTimes.reduce((a, b) => a + b, 0) / cacheTimes.length) * 10) / 10,
       fillMs: Math.round((board.lastFillMs || fillMs) * 10) / 10,
       zoomRatio: Math.round((board.zoom / board.fitZoom) * 10) / 10,
+      patternRebuildMs: Math.round(patternRebuildMs),
+      patternPanMs: Math.round(avg(patternPan) * 10) / 10,
     };
   });
   expect(perf.regions).toBeGreaterThan(2000);
   expect(perf.panMs).toBeLessThan(50);
   expect(perf.fillMs).toBeLessThan(80);
+  expect(perf.patternPanMs).toBeLessThan(50);
+  expect(perf.patternRebuildMs).toBeLessThan(2500);
   fs.writeFileSync(path.join(shotDir, "adult-perf.json"), JSON.stringify(perf, null, 2));
   await page.screenshot({ path: path.join(shotDir, "tablet-adult-zoom.png") });
 
@@ -391,7 +411,7 @@ test("studio links name WingsCrew, open the studio site, and ask a grown-up in k
 
   const sw = await page.request.get("./sw.js");
   const swText = await sw.text();
-  expect(swText).toContain('const CACHE = "wcca-v3"');
+  expect(swText).toContain('const CACHE = "wcca-v4"');
   expect(swText).toContain("./icons/logo.png");
 
   await page.goto("./");

@@ -1,11 +1,13 @@
 {
   "regions": 2113,
-  "loadMs": 153,
+  "loadMs": 102,
   "panMs": 0.3,
   "zoomMs": 0.2,
-  "vectorMs": 2,
+  "vectorMs": 1.7,
   "visibleAt6x": 96,
   "cacheMs": 0.4,
   "fillMs": 0.6,
-  "zoomRatio": 8
+  "zoomRatio": 8,
+  "patternRebuildMs": 2,
+  "patternPanMs": 0.2
 }

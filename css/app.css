@@ -250,6 +250,7 @@ body.playing #screen { height: 100dvh; max-height: 100dvh; overflow: hidden; }
 .play-title span { color: var(--muted); font-size: 0.82rem; }
 .play-tools { margin-left: auto; display: flex; flex-wrap: wrap; gap: 0.3rem; justify-content: flex-end; }
 .play-tools button, .playbar > button { padding: 0.4rem 0.7rem; }
+.play-tools button[aria-pressed="true"] { background: var(--orange); color: #fffaf3; }
 .play-hint { margin: 0; padding: 0.35rem 0.8rem; color: var(--muted); font-size: 0.85rem; background: #fff4e4; }
 .stage { flex: 1 1 auto; min-height: 0; background: var(--mat); position: relative; overflow: hidden; }
 #board { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: crosshair; }
@@ -274,13 +275,44 @@ body.playing #screen { height: 100dvh; max-height: 100dvh; overflow: hidden; }
   align-items: center;
   gap: 0.1rem;
 }
-.swatch .chip { width: 36px; height: 22px; border-radius: 7px; border: 1px solid rgba(0,0,0,0.15); }
+.swatch .chip { width: 36px; height: 22px; border-radius: 7px; border: 1px solid rgba(0,0,0,0.15); background-size: 10px 10px; }
 .swatch .num { font-weight: 800; }
+.swatch .swatch-name { font-size: 0.68rem; line-height: 1.15; max-width: 4.6rem; text-align: center; }
 .swatch .swatch-meta { font-size: 0.72rem; color: var(--muted); }
+.chip.pat-0 { background-image: repeating-linear-gradient(0deg, transparent 0 3px, rgba(27,36,48,.55) 3px 4px); }
+.chip.pat-1 { background-image: repeating-linear-gradient(90deg, transparent 0 3px, rgba(27,36,48,.55) 3px 4px); }
+.chip.pat-2 { background-image: radial-gradient(circle, rgba(27,36,48,.7) 1px, transparent 1.6px); }
+.chip.pat-3 { background-image: repeating-linear-gradient(45deg, transparent 0 3px, rgba(27,36,48,.55) 3px 4px); }
+.chip.pat-4 { background-image: repeating-linear-gradient(-45deg, transparent 0 3px, rgba(27,36,48,.55) 3px 4px); }
+.chip.pat-5 { background-image: repeating-linear-gradient(45deg, transparent 0 3px, rgba(27,36,48,.5) 3px 4px), repeating-linear-gradient(-45deg, transparent 0 3px, rgba(27,36,48,.5) 3px 4px); }
+.chip.pat-6 { background-image: radial-gradient(circle, transparent 2px, rgba(27,36,48,.65) 2.4px, transparent 3.2px); }
+.chip.pat-7 { background-image: linear-gradient(rgba(27,36,48,.65), rgba(27,36,48,.65)), linear-gradient(rgba(27,36,48,.65), rgba(27,36,48,.65)); background-size: 1.5px 100%, 100% 1.5px; background-position: center, center; background-repeat: no-repeat; }
+.chip.pat-8 { background-image: repeating-linear-gradient(90deg, rgba(27,36,48,.7) 0 3px, transparent 3px 6px); background-size: 100% 2px; background-repeat: repeat-y; background-position: 0 30%, 0 70%; }
+.chip.pat-9 { background-image: linear-gradient(rgba(27,36,48,.55), rgba(27,36,48,.55)), linear-gradient(rgba(27,36,48,.55), rgba(27,36,48,.55)); background-size: 1px 100%, 100% 1px; background-position: center, center; background-repeat: no-repeat; }
+.chip.pat-10 { background-image: linear-gradient(135deg, transparent 46%, rgba(27,36,48,.7) 46% 54%, transparent 54%), linear-gradient(45deg, transparent 46%, rgba(27,36,48,.7) 46% 54%, transparent 54%); }
+.chip.pat-11 { background-image: linear-gradient(rgba(27,36,48,.75), rgba(27,36,48,.75)); background-size: 3px 3px; background-repeat: no-repeat; background-position: 30% 30%, 70% 70%; }
+.loupe {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 4;
+  background: #fffdf8;
+  box-shadow: 0 10px 24px rgba(27, 36, 48, 0.28);
+}
 .swatch.selected { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(226, 91, 26, 0.35); }
 .swatch.done { opacity: 0.55; }
 .swatch.flash { animation: pop 0.45s ease; }
 @keyframes pop { 50% { transform: scale(1.08); background: #ffe1c4; } }
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
 
 .complete {
   position: fixed;
