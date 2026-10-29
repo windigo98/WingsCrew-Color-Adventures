@@ -1,7 +1,7 @@
 import { app, TIER_LABEL, asset } from "./state.js";
 import { Board } from "./renderer.js";
 import { getProgress, saveProgress } from "./db.js";
-import { parentGate } from "./gate.js";
+import { parentGate, studioLink } from "./gate.js";
 
 let board = null;
 let undoStack = [];
@@ -260,7 +260,7 @@ async function printPage() {
   const url = canvas.toDataURL("image/png");
   const frame = document.createElement("div");
   frame.id = "print-root";
-  frame.innerHTML = `<img alt="${escapeHtml(pictureMeta.title)}" src="${url}"><p class="print-caption">${escapeHtml(pictureMeta.title)} · © 2026 WingsCrew</p>`;
+  frame.innerHTML = `<img alt="${escapeHtml(pictureMeta.title)}" src="${url}"><p class="print-caption">${escapeHtml(pictureMeta.title)} · © 2026 ${studioLink()}</p>`;
   document.body.appendChild(frame);
   document.body.classList.add("printing");
   window.print();

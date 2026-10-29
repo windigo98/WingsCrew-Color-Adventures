@@ -377,3 +377,141 @@ test("little kids shelf asks a grown-up before outside links and buying", async 
   expect(download.suggestedFilename()).toContain("sunny-dragon");
   await expect(page.locator("#gate-title")).toHaveCount(0);
 });
+
+test("studio links name WingsCrew, open the studio site, and ask a grown-up in kid modes", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "tablet-chromium", "studio link check runs once");
+
+  await page.route("https://wingscrew.com/**", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "text/html",
+      body: "<!doctype html><title>WingsCrew</title><p>WingsCrew studio</p>",
+    })
+  );
+
+  const sw = await page.request.get("./sw.js");
+  const swText = await sw.text();
+  expect(swText).toContain('const CACHE = "wcca-v3"');
+  expect(swText).toContain("./icons/logo.png");
+
+  await page.goto("./");
+  await expect(page.locator("h1")).toHaveText("WingsCrew Color Adventures");
+  await expect(page.locator("footer p").first()).toHaveText("© 2026 WingsCrew. All rights reserved.");
+
+  const credit = page.getByRole("link", { name: "by WingsCrew" });
+  const more = page.getByRole("link", { name: "More from WingsCrew" });
+  const footerStudio = page.locator("footer").getByRole("link", { name: "WingsCrew", exact: true });
+  for (const link of [credit, more, footerStudio]) {
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute("href", "https://wingscrew.com/");
+    await expect(link).toHaveAttribute("target", "_blank");
+    await expect(link).toHaveAttribute("rel", "noopener noreferrer");
+  }
+  await expect(credit.locator("img")).toHaveAttribute("src", /logo\.png/);
+
+  const unlinkedOn = async (label) => {
+    const bad = await page.evaluate(() => {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      const found = [];
+      while (walker.nextNode()) {
+        const node = walker.currentNode;
+        if (!node.nodeValue.includes("WingsCrew")) continue;
+        const parent = node.parentElement;
+        if (parent && parent.closest("a[href='https://wingscrew.com/']")) continue;
+        found.push((parent ? parent.tagName : "?") + ": " + node.nodeValue.trim().slice(0, 90));
+      }
+      return found;
+    });
+    expect(bad, label).toEqual([]);
+  };
+  await unlinkedOn("home");
+
+  await page.getByRole("tab", { name: "Adults" }).click();
+  await expect(page.locator("#gate-title")).toHaveCount(0);
+  const adultPopup = page.waitForEvent("popup");
+  await more.click();
+  const adultPage = await adultPopup;
+  await expect(adultPage).toHaveURL(/wingscrew\.com/);
+  await expect(page.locator("#gate-title")).toHaveCount(0);
+  await adultPage.close();
+
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const adultTiers = await page.locator(".tier-switch").boundingBox();
+  await page.screenshot({
+    path: path.join(shotDir, "adults-studio-credit.png"),
+    clip: { x: 0, y: 0, width: 1024, height: Math.ceil(adultTiers.y + adultTiers.height + 20) },
+  });
+
+  await page.getByRole("tab", { name: "Little Kids" }).click();
+  let popped = false;
+  const onPopup = () => {
+    popped = true;
+  };
+  page.on("popup", onPopup);
+  await credit.click();
+  await expect(page.locator("#gate-title")).toBeVisible();
+  await page.getByRole("button", { name: "Not now" }).click();
+  await expect(page.locator("#gate-title")).toHaveCount(0);
+  await expect(page.locator("h1")).toHaveText("WingsCrew Color Adventures");
+  expect(popped).toBe(false);
+
+  await footerStudio.click();
+  await expect(page.locator("#gate-title")).toBeVisible();
+  const question = await page.locator(".modal p").nth(1).textContent();
+  const match = question.match(/(\d+) \+ (\d+)/);
+  await page.locator("#gate-answer").fill(String(Number(match[1]) + Number(match[2])));
+  const kidPopup = page.waitForEvent("popup");
+  await page.locator("#gate-form button[type=submit]").click();
+  const kidPage = await kidPopup;
+  await expect(kidPage).toHaveURL(/wingscrew\.com/);
+  await kidPage.close();
+  await expect(page.locator("#gate-title")).toHaveCount(0);
+  page.off("popup", onPopup);
+
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const littleTiers = await page.locator(".tier-switch").boundingBox();
+  await page.screenshot({
+    path: path.join(shotDir, "little-kids-studio-credit.png"),
+    clip: { x: 0, y: 0, width: 1024, height: Math.ceil(littleTiers.y + littleTiers.height + 20) },
+  });
+
+  await page.getByRole("tab", { name: "Big Kids" }).click();
+  await more.click();
+  await expect(page.locator("#gate-title")).toBeVisible();
+  await page.getByRole("button", { name: "Not now" }).click();
+  await expect(page.locator("#gate-title")).toHaveCount(0);
+
+  await page.locator("#nav-shop").click();
+  await page.locator("input[name=code]").fill("not-a-code");
+  await page.getByRole("button", { name: "Unlock" }).click();
+  const codeLink = page.locator("#code-error a");
+  await expect(codeLink).toHaveAttribute("href", "https://wingscrew.com/");
+  await expect(codeLink).toHaveAttribute("rel", "noopener noreferrer");
+  await codeLink.click();
+  await expect(page.locator("#gate-title")).toBeVisible();
+  await page.getByRole("button", { name: "Not now" }).click();
+
+  await page.goto("./#/settings");
+  await expect(page.getByRole("link", { name: "More from WingsCrew" })).toBeVisible();
+  await unlinkedOn("settings");
+  await page.goto("./#/how");
+  await unlinkedOn("how buying works");
+
+  await page.setViewportSize({ width: 1180, height: 820 });
+  await page.goto("./");
+  await expect(credit).toBeVisible();
+  await expect(more).toBeVisible();
+  const wideHeader = page.locator("header.top");
+  expect(await wideHeader.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(1);
+  expect((await credit.boundingBox()).height).toBeGreaterThanOrEqual(44);
+  expect((await more.boundingBox()).height).toBeGreaterThanOrEqual(44);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(credit).toBeVisible();
+  await expect(more).toBeVisible();
+  const narrowHeader = page.locator("header.top");
+  expect(await narrowHeader.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(1);
+  expect((await credit.boundingBox()).height).toBeGreaterThanOrEqual(44);
+  expect((await more.boundingBox()).height).toBeGreaterThanOrEqual(44);
+  expect((await footerStudio.boundingBox()).height).toBeGreaterThanOrEqual(44);
+});

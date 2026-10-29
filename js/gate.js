@@ -7,6 +7,24 @@ export function inKidsMode() {
   return app.tierFilter === "little" || app.tierFilter === "big";
 }
 
+export const STUDIO_URL = "https://wingscrew.com/";
+
+/** Visible studio name. The whole link leaves the app, so kid modes run it through parentGate. */
+export function studioLink(label = "WingsCrew", className = "studio-link") {
+  return `<a class="${className}" href="${STUDIO_URL}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+}
+
+export function linkifyStudioMentions(text) {
+  const escaped = String(text).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  }[c]));
+  return escaped.split("WingsCrew").join(studioLink());
+}
+
 export function isExternalHref(href) {
   if (!href) return false;
   const raw = href.trim();

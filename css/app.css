@@ -59,24 +59,38 @@ img { max-width: 100%; }
   background: color-mix(in srgb, var(--paper) 88%, transparent);
   backdrop-filter: blur(10px);
 }
-.brand {
-  display: flex;
+.studio-credit {
+  display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0.15rem 0.2rem;
   text-decoration: none;
   color: var(--ink);
   font-weight: 700;
   letter-spacing: 0.01em;
 }
-.brand img {
+.studio-credit img {
   width: auto;
   height: 52px;
   border-radius: 0;
   background: transparent;
   object-fit: contain;
 }
-.top nav { margin-left: auto; display: flex; gap: 0.5rem; align-items: center; }
-.top nav a { text-decoration: none; font-weight: 650; }
+.studio-credit span { white-space: nowrap; }
+.top nav { margin-left: auto; display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.top nav a, #nav-shop {
+  text-decoration: none;
+  font-weight: 650;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+}
+a.hero-mark { display: flex; align-items: center; line-height: 0; color: inherit; }
+.eyebrow a.studio-link, h1 a.studio-link, .fine a.studio-link { color: inherit; }
+h1 a.studio-link, .fine a.studio-link { text-underline-offset: 0.15em; }
+.more-from { margin-top: 0.85rem; min-height: 44px; }
 #nav-back { background: transparent; color: var(--ink); border: 1px solid var(--line); padding: 0.45rem 0.8rem; }
 
 #screen { flex: 1; }
@@ -88,6 +102,12 @@ img { max-width: 100%; }
   font-size: 0.86rem;
 }
 .site-foot p { margin: 0.2rem 0; }
+.site-foot a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.15rem 0.2rem;
+}
 
 .hero { display: flex; gap: 1rem; align-items: center; margin: 0.4rem 0 1rem; }
 .hero-logo {
@@ -306,6 +326,11 @@ body.playing #screen { height: 100dvh; max-height: 100dvh; overflow: hidden; }
 }
 
 @media (max-width: 720px) {
+  .top { gap: 0.35rem; padding-left: 0.65rem; padding-right: 0.65rem; }
+  .studio-credit { gap: 0.3rem; font-size: 0.92rem; }
+  .studio-credit img { height: 44px; }
+  .top nav { gap: 0.1rem; }
+  .top nav a, #nav-shop { padding: 0.35rem 0.45rem; }
   .hero { flex-direction: column; align-items: flex-start; }
   .card-grid, .pack-grid { grid-template-columns: 1fr 1fr; }
   .store-card { grid-template-columns: 1fr; }

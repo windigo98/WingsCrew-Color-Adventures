@@ -1,6 +1,6 @@
 import { app, asset } from "./state.js";
 import { lookupCode, rememberUnlock, hasAccess } from "./unlock.js";
-import { inKidsMode, parentGate } from "./gate.js";
+import { inKidsMode, linkifyStudioMentions, parentGate, studioLink } from "./gate.js";
 
 const BUY_CLEAR = "wcca-buy-cleared";
 
@@ -53,7 +53,7 @@ export function renderShop(root) {
     const found = await lookupCode(code);
     if (!found.ok) {
       err.hidden = false;
-      err.textContent = found.reason;
+      err.innerHTML = linkifyStudioMentions(found.reason);
       return;
     }
     const product = productById(found.product);
@@ -144,7 +144,7 @@ export function renderHow(root) {
       <h1>Five small steps. Pay once.</h1>
       <ol class="steps">
         <li><strong>You tap Buy.</strong> Pick a pack, the Full Unlock, a bundle, or the future-packs pass.</li>
-        <li><strong>Payhip takes the payment.</strong> You go to a secure checkout on payhip.com and pay by card or PayPal. This app never sees your card number. On the web, the charge comes from Payhip, not from WingsCrew Color Adventures.</li>
+        <li><strong>Payhip takes the payment.</strong> You go to a secure checkout on payhip.com and pay by card or PayPal. This app never sees your card number. On the web, the charge comes from Payhip, not from ${studioLink()} Color Adventures.</li>
         <li><strong>Payhip emails your code.</strong> Right after payment, Payhip sends a license unlock code.</li>
         <li><strong>Come back and paste it.</strong> Open Enter unlock code in the shop and paste the code.</li>
         <li><strong>It stays unlocked.</strong> The pack unlocks on this device. The same code works again if you reinstall or restore a backup.</li>

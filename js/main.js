@@ -5,7 +5,7 @@ import { openPlay, closePlay } from "./play.js";
 import { renderShop, renderHow, renderCheckout } from "./shop.js";
 import { renderPhoto } from "./photo.js";
 import { exportBackup, importBackup } from "./backup.js";
-import { inKidsMode, isExternalHref, parentGate } from "./gate.js";
+import { inKidsMode, isExternalHref, linkifyStudioMentions, parentGate, studioLink } from "./gate.js";
 
 const screen = () => document.getElementById("screen");
 let cleanup = null;
@@ -154,11 +154,14 @@ async function renderHome(root) {
   root.innerHTML = `
     <section class="screen home">
       <div class="hero">
-        <img class="hero-logo" src="${asset("icons/logo.png")}" alt="WingsCrew">
+        <a class="hero-mark" href="https://wingscrew.com/" target="_blank" rel="noopener noreferrer">
+          <img class="hero-logo" src="${asset("icons/logo.png")}" alt="WingsCrew">
+        </a>
         <div>
-          <p class="eyebrow">WingsCrew studio</p>
-          <h1>WingsCrew Color Adventures</h1>
+          <p class="eyebrow">${studioLink()} studio</p>
+          <h1>${studioLink()} Color Adventures</h1>
           <p>Calm pages for little kids, big kids, and adults. No ads. Your photos never leave this device.</p>
+          ${studioLink("More from WingsCrew", "button more-from")}
         </div>
       </div>
       <div class="tier-switch" role="tablist">
@@ -250,7 +253,9 @@ function renderSettings(root) {
   const s = app.settings;
   root.innerHTML = `
     <section class="screen settings">
-      <img class="hero-logo small" src="${asset("icons/logo.png")}" alt="WingsCrew">
+      <a class="hero-mark" href="https://wingscrew.com/" target="_blank" rel="noopener noreferrer">
+        <img class="hero-logo small" src="${asset("icons/logo.png")}" alt="WingsCrew">
+      </a>
       <h1>Settings</h1>
       <label class="check"><input type="checkbox" data-set="penOnly" ${s.penOnly ? "checked" : ""}> Pen-only fill. Fingers only pan and zoom.</label>
       <label class="check"><input type="checkbox" data-set="shade" ${s.shade ? "checked" : ""}> Pen shading. Pressure darkens a filled region.</label>
@@ -269,10 +274,11 @@ function renderSettings(root) {
       <h2>Install</h2>
       <p>iPad or iPhone: Share, then Add to Home Screen. Android: use Install if Chrome offers it, or the browser menu.</p>
       <h2>About</h2>
-      <p>WingsCrew Color Adventures is a calm color-by-number book from J D's WingsCrew studio. Photos are processed only on your device. There are no ads, no accounts, and no trackers.</p>
+      <p>${studioLink()} Color Adventures is a calm color-by-number book from J D's ${studioLink()} studio. Photos are processed only on your device. There are no ads, no accounts, and no trackers.</p>
       <p>Unlock codes are checked offline. That only stops casual copying.</p>
-      <p><a href="mailto:dovewingsbusiness@gmail.com">Feedback</a> · <a href="https://cash.app/$windigo98" rel="noopener">Tip on Cash App</a> · <a href="#/how">How buying works</a></p>
-      <p class="fine">© 2026 WingsCrew. All rights reserved.</p>
+      ${studioLink("More from WingsCrew", "button more-from")}
+      <p><a href="mailto:dovewingsbusiness@gmail.com">Feedback</a> · <a href="https://cash.app/$windigo98" rel="noopener noreferrer" target="_blank">Tip on Cash App</a> · <a href="#/how">How buying works</a></p>
+      <p class="fine">© 2026 ${studioLink()}. All rights reserved.</p>
     </section>`;
   root.querySelectorAll("[data-set]").forEach((input) => {
     input.addEventListener("change", () => {
@@ -290,14 +296,12 @@ function renderSettings(root) {
       const result = await importBackup(file);
       msg.textContent = `Restored ${result.pictures} pages and ${result.codes} unlock code${result.codes === 1 ? "" : "s"}.`;
     } catch (err) {
-      msg.textContent = err.message || "Could not read that file.";
+      msg.innerHTML = linkifyStudioMentions(err.message || "Could not read that file.");
     }
   });
 }
 
-let lettingThrough = false;
 document.addEventListener("click", async (event) => {
-  if (lettingThrough) return;
   const link = event.target.closest("a[href]");
   if (!link || !inKidsMode()) return;
   const href = link.getAttribute("href");
@@ -305,19 +309,10 @@ document.addEventListener("click", async (event) => {
   event.preventDefault();
   event.stopPropagation();
   if (!(await parentGate())) return;
-  lettingThrough = true;
-  try {
-    if (link.target === "_blank") {
-      const opened = document.createElement("a");
-      opened.href = link.href;
-      opened.target = "_blank";
-      opened.rel = "noopener";
-      opened.click();
-    } else {
-      location.href = link.href;
-    }
-  } finally {
-    lettingThrough = false;
+  if (link.target === "_blank") {
+    window.open(link.href, "_blank", "noopener,noreferrer");
+  } else {
+    location.href = link.href;
   }
 }, true);
 
