@@ -2,6 +2,7 @@ import { app, TIER_LABEL, asset } from "./state.js";
 import { Board } from "./renderer.js";
 import { getProgress, saveProgress } from "./db.js";
 import { parentGate, studioLink } from "./gate.js";
+import { LOUPE_PAN_SLOP, loupeOffset, nextRegion, patternId } from "./aids.js";
 
 let board = null;
 let undoStack = [];
@@ -53,12 +54,16 @@ export async function openPlay(root, picture, meta) {
           <button type="button" data-act="zoomout" aria-label="Zoom out">−</button>
           <button type="button" data-act="zoomin" aria-label="Zoom in">+</button>
           <button type="button" data-act="fit">Fit</button>
-          <button type="button" data-act="next">Next</button>
+          <button type="button" data-act="next">${picture.tier === "adult" ? "Find next" : "Next"}</button>
           <button type="button" data-act="highlight" aria-pressed="true">Highlight</button>
+          ${picture.tier === "adult" ? `<button type="button" data-act="loupe" aria-pressed="${app.settings.loupe ? "true" : "false"}">Magnifier</button>` : ""}
         </div>
       </div>
       <p class="play-hint" id="play-hint">Tap a color, then tap matching shapes. Pinch to zoom. Drag to move.</p>
-      <div class="stage"><canvas id="board" aria-label="Coloring page"></canvas></div>
+      <div class="stage">
+        <canvas id="board" aria-label="Coloring page"></canvas>
+        <canvas id="loupe" class="loupe" width="280" height="280" hidden aria-hidden="true"></canvas>
+      </div>
       <div class="palette" id="palette" role="listbox" aria-label="Colors"></div>
       <div class="complete" id="complete" hidden>
         <div class="complete-card">
@@ -77,6 +82,8 @@ export async function openPlay(root, picture, meta) {
   board = new Board(canvas);
   app.board = board;
   board.numberScale = app.settings.numberScale;
+  board.bigNumbers = !!app.settings.bigNumbers;
+  board.patterns = !!app.settings.patterns;
   board.thickLines = app.settings.thickLines;
   board.highlight = true;
   const t0 = performance.now();
@@ -108,12 +115,17 @@ function renderPalette() {
   const el = document.getElementById("palette");
   if (!el || !board) return;
   const { total, done } = board.colorStats();
+  const showNames = !!app.settings.colorNames;
+  const showPatterns = !!app.settings.patterns;
   el.innerHTML = board.picture.palette
     .map((color, i) => {
       const finished = total[i] > 0 && done[i] === total[i];
-      return `<button type="button" class="swatch${i === board.selected ? " selected" : ""}${finished ? " done" : ""}" data-color="${i}" role="option" aria-selected="${i === board.selected}">
-        <span class="chip" style="background:${color.hex}"></span>
+      const name = color.name ? escapeHtml(color.name) : "";
+      const label = `Color ${i + 1}${name ? ", " + name : ""}, ${done[i]} of ${total[i]}`;
+      return `<button type="button" class="swatch${i === board.selected ? " selected" : ""}${finished ? " done" : ""}" data-color="${i}" role="option" aria-selected="${i === board.selected}" aria-label="${label}">
+        <span class="chip${showPatterns ? ` pat pat-${patternId(i)}` : ""}" style="background-color:${color.hex}"></span>
         <span class="num">${i + 1}</span>
+        ${showNames && name ? `<span class="swatch-name">${name}</span>` : ""}
         <span class="swatch-meta">${done[i]}/${total[i]}${finished ? " ✓" : ""}</span>
       </button>`;
     })
@@ -217,18 +229,23 @@ function redo(meta) {
 }
 
 function nextUnfilled() {
-  const preferred = [];
-  const any = [];
-  for (const r of board.regions) {
-    if (board.filled[r.i]) continue;
-    any.push(r);
-    if (r.c === board.selected) preferred.push(r);
+  const onlySelected = pictureMeta?.tier === "adult";
+  const found = nextRegion(board.regions, board.filled, board.selected, cursor, onlySelected);
+  cursor = found.cursor;
+  if (!found.region) {
+    window.__WCCA = window.__WCCA || {};
+    window.__WCCA.lastNext = -1;
+    const hint = document.getElementById("play-hint");
+    if (hint) {
+      hint.hidden = false;
+      hint.textContent = "That color is all filled. Pick another color.";
+    }
+    return;
   }
-  const pool = preferred.length ? preferred : any;
-  if (!pool.length) return;
-  cursor = (cursor + 1) % pool.length;
   board.gesturing = false;
-  board.zoomToRegion(pool[cursor]);
+  board.zoomToRegion(found.region);
+  window.__WCCA = window.__WCCA || {};
+  window.__WCCA.lastNext = found.region.i;
 }
 
 async function savePng() {
@@ -272,6 +289,7 @@ async function printPage() {
 
 function bindPlay(root, picture, meta) {
   const canvas = root.querySelector("#board");
+  const loupe = root.querySelector("#loupe");
   const pointers = new Map();
   let mode = null;
   let moved = false;
@@ -285,10 +303,70 @@ function bindPlay(root, picture, meta) {
     return { x: e.clientX - rect.left, y: e.clientY - rect.top };
   };
 
+  let loupeEvent = null;
+  let loupeRaf = 0;
+  const hideLoupe = () => {
+    loupeEvent = null;
+    if (loupe) loupe.hidden = true;
+  };
+  const paintLoupe = (point) => {
+    if (!loupe || !board || !app.settings.loupe || picture.tier !== "adult") return;
+    const stage = canvas.parentElement.getBoundingClientRect();
+    const localX = point.clientX - stage.left;
+    const localY = point.clientY - stage.top;
+    if (localX < 0 || localY < 0 || localX > stage.width || localY > stage.height) {
+      loupe.hidden = true;
+      return;
+    }
+    const pos = loupeOffset(localX, localY, stage.width, stage.height, 140, 18);
+    loupe.style.left = `${pos.left}px`;
+    loupe.style.top = `${pos.top}px`;
+    loupe.hidden = false;
+    const ctx = loupe.getContext("2d");
+    const size = loupe.width;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const sx = (point.clientX - rect.left) * scaleX;
+    const sy = (point.clientY - rect.top) * scaleY;
+    const src = 18 * scaleX;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, size, size);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, size / 2 - 6, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.drawImage(canvas, sx - src, sy - src, src * 2, src * 2, 0, 0, size, size);
+    ctx.restore();
+    ctx.strokeStyle = "#1b2430";
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, size / 2 - 8, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.strokeStyle = "#e25b1a";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(size / 2 - 16, size / 2);
+    ctx.lineTo(size / 2 + 16, size / 2);
+    ctx.moveTo(size / 2, size / 2 - 16);
+    ctx.lineTo(size / 2, size / 2 + 16);
+    ctx.stroke();
+  };
+  const queueLoupe = (e) => {
+    if (!app.settings.loupe || picture.tier !== "adult") return;
+    loupeEvent = { clientX: e.clientX, clientY: e.clientY };
+    if (loupeRaf) return;
+    loupeRaf = requestAnimationFrame(() => {
+      loupeRaf = 0;
+      if (loupeEvent) paintLoupe(loupeEvent);
+    });
+  };
+
   const onClick = (e) => {
     const colorBtn = e.target.closest("[data-color]");
     if (colorBtn) {
       board.selected = +colorBtn.dataset.color;
+      cursor = -1;
       board.rebuildHighlight();
       board.requestDraw();
       renderPalette();
@@ -314,6 +392,12 @@ function bindPlay(root, picture, meta) {
       board.requestDraw();
     }
     if (act === "next") nextUnfilled();
+    if (act === "loupe") {
+      app.settings.loupe = !app.settings.loupe;
+      e.target.closest("[data-act]").setAttribute("aria-pressed", String(app.settings.loupe));
+      localStorage.setItem("wcca-settings", JSON.stringify(app.settings));
+      if (!app.settings.loupe) hideLoupe();
+    }
     if (act === "highlight") {
       board.highlight = !board.highlight;
       e.target.closest("[data-act]").setAttribute("aria-pressed", String(board.highlight));
@@ -366,9 +450,11 @@ function bindPlay(root, picture, meta) {
       moved = false;
       start = { x: e.clientX, y: e.clientY, t: performance.now(), type: e.pointerType, panX: board.panX, panY: board.panY };
       pinch = null;
+      queueLoupe(e);
     } else if (pointers.size === 2) {
       mode = "pinch";
       moved = true;
+      hideLoupe();
       const pts = [...pointers.values()];
       pinch = { dist: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) || 1 };
     }
@@ -380,7 +466,11 @@ function bindPlay(root, picture, meta) {
       penHover = e.buttons === 0 || penHover;
       if (e.buttons === 0) penHover = true;
     }
-    if (!pointers.has(e.pointerId)) return;
+    if (!pointers.has(e.pointerId)) {
+      if (e.pointerType === "mouse" && pointers.size === 0) queueLoupe(e);
+      return;
+    }
+    if (pointers.size === 1) queueLoupe(e);
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, type: e.pointerType });
     if (mode === "pinch" && pointers.size >= 2 && pinch) {
       const pts = [...pointers.values()];
@@ -397,7 +487,8 @@ function bindPlay(root, picture, meta) {
     if (!start || mode === "pinch") return;
     const dx = e.clientX - start.x;
     const dy = e.clientY - start.y;
-    if (!moved && Math.hypot(dx, dy) > 9) {
+    const slop = app.settings.loupe && picture.tier === "adult" ? LOUPE_PAN_SLOP : 9;
+    if (!moved && Math.hypot(dx, dy) > slop) {
       moved = true;
       mode = "pan";
       board.gesturing = true;
@@ -444,6 +535,7 @@ function bindPlay(root, picture, meta) {
       mode = null;
       start = null;
       pinch = null;
+      hideLoupe();
       board.gesturing = false;
       board.requestDraw();
     }
@@ -452,6 +544,7 @@ function bindPlay(root, picture, meta) {
   canvas.addEventListener("pointercancel", endPointer);
   canvas.addEventListener("pointerleave", (e) => {
     if (e.pointerType === "pen") penHover = false;
+    if (pointers.size === 0) hideLoupe();
   });
 
   const ro = new ResizeObserver(() => {
@@ -467,6 +560,8 @@ function bindPlay(root, picture, meta) {
     root.removeEventListener("click", onClick);
     window.removeEventListener("keydown", onKey);
     clearTimeout(saveTimer);
+    if (loupeRaf) cancelAnimationFrame(loupeRaf);
+    hideLoupe();
     if (board) {
       const snap = board.snapshot();
       saveProgress({

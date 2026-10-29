@@ -6,6 +6,14 @@ import { renderShop, renderHow, renderCheckout } from "./shop.js";
 import { renderPhoto } from "./photo.js";
 import { exportBackup, importBackup } from "./backup.js";
 import { inKidsMode, isExternalHref, linkifyStudioMentions, parentGate, studioLink } from "./gate.js";
+import {
+  effectiveReduceMotion,
+  isIosDevice,
+  isRunningStandalone,
+  isSafariBrowser,
+  requestPersistentStorage,
+  shouldShowIosHomeHint,
+} from "./aids.js";
 
 const screen = () => document.getElementById("screen");
 let cleanup = null;
@@ -25,6 +33,31 @@ function saveSettings() {
   localStorage.setItem("wcca-settings", JSON.stringify(app.settings));
 }
 
+function motionQuery() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)");
+}
+
+function applyMotion() {
+  const reduced = effectiveReduceMotion(app.settings.reduceMotion, motionQuery().matches);
+  document.documentElement.classList.toggle("reduce-motion", reduced);
+}
+
+function askToKeepStorage() {
+  requestPersistentStorage(navigator.storage);
+}
+
+function showIosHomeHint() {
+  if (app.settings.installDismissed) return false;
+  if (window.__WCCA_FORCE_IOS_HINT) return true;
+  const standalone = isRunningStandalone(navigator, window.matchMedia("(display-mode: standalone)").matches);
+  return shouldShowIosHomeHint({
+    ios: isIosDevice(navigator),
+    safari: isSafariBrowser(navigator.userAgent || ""),
+    standalone,
+    dismissed: false,
+  });
+}
+
 async function boot() {
   loadSettings();
   const [catalogRes, payRes, ent] = await Promise.all([
@@ -35,7 +68,15 @@ async function boot() {
   app.catalog = await catalogRes.json();
   app.payments = await payRes.json();
   app.ent = ent;
-  if (navigator.storage?.persist) navigator.storage.persist().catch(() => {});
+  applyMotion();
+  const motion = motionQuery();
+  const onMotionChange = () => {
+    if (app.settings.reduceMotion === "auto") applyMotion();
+  };
+  if (motion.addEventListener) motion.addEventListener("change", onMotionChange);
+  else if (motion.addListener) motion.addListener(onMotionChange);
+  askToKeepStorage();
+  window.addEventListener("pointerdown", askToKeepStorage, { once: true, capture: true });
   registerSW();
   installHooks();
   window.addEventListener("hashchange", route);
@@ -44,6 +85,7 @@ async function boot() {
     app,
     asset,
     ready: true,
+    requestPersistentStorage,
   });
 }
 
@@ -150,7 +192,8 @@ async function renderHome(root) {
   const filter = app.tierFilter;
   const lastBackup = Number(localStorage.getItem("wcca-last-backup") || 0);
   const showBackup = progress.length > 0 && Date.now() - lastBackup > 1000 * 60 * 60 * 24 * 7;
-  const showInstall = !app.settings.installDismissed && app.settings.visits >= 2;
+  const showIosHint = showIosHomeHint();
+  const showInstall = !showIosHint && !app.settings.installDismissed && app.settings.visits >= 2;
   root.innerHTML = `
     <section class="screen home">
       <div class="hero">
@@ -180,6 +223,7 @@ async function renderHome(root) {
           : ""
       }
       <a class="photo-cta" href="#/photo">+ From a photo</a>
+      ${showIosHint ? iosHomeHint() : ""}
       ${showInstall ? installCard() : ""}
       ${showBackup ? `<p class="banner">It's been a while since a backup. Safari can clear site data. <a href="#/settings">Save a backup file</a>.</p>` : ""}
       ${app.catalog.packs
@@ -237,6 +281,17 @@ function pictureCard(p, locked) {
   </a>`;
 }
 
+function iosHomeHint() {
+  return `<aside class="install-card" id="ios-home-hint">
+    <h2>Add ${studioLink()} Colors to your Home Screen</h2>
+    <p>On iPhone or iPad, Safari can forget coloring that stays in a browser tab. Tap Share, then Add to Home Screen, and open ${studioLink()} Colors from the icon.</p>
+    <p>A grown-up can also save a backup file in <a href="#/settings">Settings</a>.</p>
+    <div class="row-actions">
+      <button type="button" class="ghost" data-dismiss-install>Not now</button>
+    </div>
+  </aside>`;
+}
+
 function installCard() {
   const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   return `<aside class="install-card">
@@ -261,11 +316,17 @@ function renderSettings(root) {
       <label class="check"><input type="checkbox" data-set="shade" ${s.shade ? "checked" : ""}> Pen shading. Pressure darkens a filled region.</label>
       <label class="check"><input type="checkbox" data-set="sound" ${s.sound ? "checked" : ""}> Soft sounds</label>
       <label class="check"><input type="checkbox" data-set="thickLines" ${s.thickLines ? "checked" : ""}> Thicker outlines</label>
+      <h2>Easier to see</h2>
+      <label class="check"><input type="checkbox" data-set="colorNames" ${s.colorNames ? "checked" : ""}> Color names on the paint pots</label>
+      <label class="check"><input type="checkbox" data-set="patterns" ${s.patterns ? "checked" : ""}> Patterns on colors</label>
+      <label class="check"><input type="checkbox" data-set="bigNumbers" ${s.bigNumbers ? "checked" : ""}> Big numbers</label>
       <label>Number size
         <input data-set="numberScale" type="range" min="0.7" max="1.6" step="0.1" value="${s.numberScale}">
       </label>
+      <label class="check"><input type="checkbox" id="reduce-motion" ${effectiveReduceMotion(s.reduceMotion, motionQuery().matches) ? "checked" : ""}> Reduce motion</label>
+      <p class="fine">Reduce motion starts from this device's setting. Change it any time.</p>
       <h2>On this device</h2>
-      <p>Coloring, unlocks, and photo pages are saved in this browser. Export a backup so a cleanup doesn't erase them.</p>
+      <p>Coloring, unlocks, and photo pages are saved in this browser. Save a backup file so a cleanup doesn't erase them. On an iPad, adding ${studioLink()} Colors to the Home Screen keeps pages safer too.</p>
       <div class="row-actions">
         <button type="button" id="backup-btn">Export backup</button>
         <label class="button ghost">Import backup<input id="restore-file" type="file" accept="application/json,.json" hidden></label>
@@ -287,6 +348,14 @@ function renderSettings(root) {
       saveSettings();
     });
   });
+  const motionBox = root.querySelector("#reduce-motion");
+  if (motionBox) {
+    motionBox.addEventListener("change", () => {
+      app.settings.reduceMotion = motionBox.checked ? "on" : "off";
+      saveSettings();
+      applyMotion();
+    });
+  }
   root.querySelector("#backup-btn").addEventListener("click", () => exportBackup());
   root.querySelector("#restore-file").addEventListener("change", async (e) => {
     const file = e.target.files[0];
@@ -294,6 +363,10 @@ function renderSettings(root) {
     if (!file) return;
     try {
       const result = await importBackup(file);
+      if (!result) {
+        msg.textContent = "";
+        return;
+      }
       msg.textContent = `Restored ${result.pictures} pages and ${result.codes} unlock code${result.codes === 1 ? "" : "s"}.`;
     } catch (err) {
       msg.innerHTML = linkifyStudioMentions(err.message || "Could not read that file.");

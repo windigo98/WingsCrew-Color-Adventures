@@ -1,6 +1,87 @@
+import { numberStyle, patternId } from "./aids.js";
+
 const PAPER = "#fbf7ef";
 const INK = "#1b2430";
 const MAT = "#efe6d6";
+
+const patternTiles = new Map();
+
+function patternTile(id) {
+  if (patternTiles.has(id)) return patternTiles.get(id);
+  const c = document.createElement("canvas");
+  c.width = 16;
+  c.height = 16;
+  const g = c.getContext("2d");
+  g.strokeStyle = "rgba(27,36,48,0.72)";
+  g.fillStyle = "rgba(27,36,48,0.72)";
+  g.lineWidth = 1.6;
+  g.lineCap = "square";
+  const line = (x0, y0, x1, y1) => {
+    g.beginPath();
+    g.moveTo(x0, y0);
+    g.lineTo(x1, y1);
+    g.stroke();
+  };
+  switch (id) {
+    case 0:
+      line(0, 4, 16, 4);
+      line(0, 12, 16, 12);
+      break;
+    case 1:
+      line(4, 0, 4, 16);
+      line(12, 0, 12, 16);
+      break;
+    case 2:
+      for (const [x, y] of [[4, 4], [12, 4], [4, 12], [12, 12]]) {
+        g.beginPath();
+        g.arc(x, y, 1.7, 0, Math.PI * 2);
+        g.fill();
+      }
+      break;
+    case 3:
+      line(0, 16, 16, 0);
+      line(-4, 8, 8, -4);
+      line(8, 20, 20, 8);
+      break;
+    case 4:
+      line(0, 0, 16, 16);
+      line(-4, 8, 8, 20);
+      line(8, -4, 20, 8);
+      break;
+    case 5:
+      line(0, 0, 16, 16);
+      line(0, 16, 16, 0);
+      break;
+    case 6:
+      g.beginPath();
+      g.arc(8, 8, 4.5, 0, Math.PI * 2);
+      g.stroke();
+      break;
+    case 7:
+      line(8, 1, 8, 15);
+      line(1, 8, 15, 8);
+      break;
+    case 8:
+      line(1, 5, 7, 5);
+      line(9, 11, 15, 11);
+      break;
+    case 9:
+      line(0, 8, 16, 8);
+      line(8, 0, 8, 16);
+      line(0, 0, 16, 0);
+      break;
+    case 10:
+      line(0, 11, 8, 4);
+      line(8, 4, 16, 11);
+      break;
+    default:
+      g.fillRect(2, 2, 4, 4);
+      g.fillRect(10, 10, 4, 4);
+      break;
+  }
+  patternTiles.set(id, c);
+  return c;
+}
 
 function parseLoops(d) {
   const loops = [];
@@ -65,7 +146,11 @@ export class Board {
     this.highlight = true;
     this.selected = 0;
     this.numberScale = 1;
+    this.bigNumbers = false;
+    this.patterns = false;
     this.thickLines = false;
+    this._patternStyles = null;
+    this._scratch = null;
     this.gesturing = false;
     this.frameTimes = [];
     this.lastFillMs = 0;
@@ -160,10 +245,44 @@ export class Board {
     this._worldTransform(ctx, scale);
     ctx.fillStyle = PAPER;
     ctx.fillRect(0, 0, 1000, 1000);
-    for (const r of this.regions) {
-      ctx.fillStyle = this.filled[r.i] ? this.styleOf(r) : PAPER;
-      ctx.fill(r.path, "evenodd");
+    for (const r of this.regions) this._fillRegion(ctx, r);
+  }
+
+  _scratchCtx() {
+    if (this._scratch) return this._scratch;
+    const canvas = document.createElement("canvas");
+    canvas.width = 1;
+    canvas.height = 1;
+    this._scratch = canvas.getContext("2d");
+    return this._scratch;
+  }
+
+  _patternStyle(colorIndex) {
+    if (!this._patternStyles) this._patternStyles = new Map();
+    const id = patternId(colorIndex);
+    if (!this._patternStyles.has(id)) {
+      const ctx = this._scratchCtx();
+      this._patternStyles.set(id, ctx.createPattern(patternTile(id), "repeat"));
     }
+    return this._patternStyles.get(id);
+  }
+
+  _fillRegion(ctx, region) {
+    if (this.filled[region.i]) {
+      ctx.fillStyle = this.styleOf(region);
+      ctx.fill(region.path, "evenodd");
+      return;
+    }
+    ctx.fillStyle = PAPER;
+    ctx.fill(region.path, "evenodd");
+    if (!this.patterns) return;
+    ctx.fillStyle = this._patternStyle(region.c);
+    ctx.fill(region.path, "evenodd");
+  }
+
+  _rebuildPatterns() {
+    this._patternStyles = new Map();
+    this._paintCache();
   }
 
   _paintLines() {
@@ -185,8 +304,7 @@ export class Board {
     const scale = this.cacheSize / 1000;
     const ctx = this.cctx;
     this._worldTransform(ctx, scale);
-    ctx.fillStyle = this.filled[r.i] ? this.styleOf(r) : PAPER;
-    ctx.fill(r.path, "evenodd");
+    this._fillRegion(ctx, r);
     const lctx = this.lctx;
     this._worldTransform(lctx, scale);
     lctx.strokeStyle = INK;
@@ -408,10 +526,7 @@ export class Board {
       ctx.scale(this.zoom, this.zoom);
       ctx.fillStyle = PAPER;
       ctx.fillRect(0, 0, 1000, 1000);
-      for (const r of visible) {
-        ctx.fillStyle = this.filled[r.i] ? this.styleOf(r) : PAPER;
-        ctx.fill(r.path, "evenodd");
-      }
+      for (const r of visible) this._fillRegion(ctx, r);
       ctx.strokeStyle = INK;
       ctx.lineJoin = "round";
       ctx.lineCap = "round";
@@ -446,11 +561,11 @@ export class Board {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = "rgba(27,36,48,0.86)";
-    const minPx = 10 * this.numberScale;
+    const style = numberStyle(this.numberScale, this.bigNumbers);
     for (const r of this.regions) {
       if (this.filled[r.i]) continue;
-      const fontPx = Math.min(44, Math.sqrt(r.area) * this.zoom * 0.2 * this.numberScale);
-      if (fontPx < minPx) continue;
+      const fontPx = this.fontPxFor(r);
+      if (fontPx < style.minPx) continue;
       const sx = r.x * this.zoom + this.panX;
       const sy = r.y * this.zoom + this.panY;
       if (sx < -20 || sy < -20 || sx > this.cssW + 20 || sy > this.cssH + 20) continue;
@@ -458,6 +573,11 @@ export class Board {
       ctx.fillText(String(r.c + 1), sx, sy);
     }
     ctx.restore();
+  }
+
+  fontPxFor(region) {
+    const style = numberStyle(this.numberScale, this.bigNumbers);
+    return Math.min(style.cap, Math.sqrt(region.area) * this.zoom * 0.2 * style.scale);
   }
 
   exportCanvas(size = 1800, withNumbers = false) {

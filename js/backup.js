@@ -25,6 +25,7 @@ export async function exportBackup() {
 }
 
 export async function importBackup(file) {
+  if (inKidsMode() && !(await parentGate())) return null;
   const text = await file.text();
   const data = JSON.parse(text);
   if (!data || data.app !== "wingscrew-color-adventures") throw new Error("That file isn't a WingsCrew backup.");
