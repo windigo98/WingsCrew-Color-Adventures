@@ -411,7 +411,7 @@ test("studio links name WingsCrew, open the studio site, and ask a grown-up in k
 
   const sw = await page.request.get("./sw.js");
   const swText = await sw.text();
-  expect(swText).toContain('const CACHE = "wcca-v4"');
+  expect(swText).toContain('const CACHE = "wcca-v5"');
   expect(swText).toContain("./icons/logo.png");
 
   await page.goto("./");

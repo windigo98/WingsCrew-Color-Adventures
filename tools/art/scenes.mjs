@@ -1,4 +1,7 @@
 import { kit, swatch } from "./drawkit.mjs";
+import { OCEAN } from "./scenes-ocean.mjs";
+import { ABOARD } from "./scenes-aboard.mjs";
+import { LANTERN } from "./scenes-lantern.mjs";
 
 const P = (...items) => items.map(([hex, name]) => swatch(hex, name));
 
@@ -1050,4 +1053,7 @@ export const PICTURES = [
       for (let i = 0; i < 8; i++) d.ell(400 + (i % 4) * 50, 400 + Math.floor(i / 4) * 40, 10, 16, 7, 0.4);
     },
   }),
+  ...OCEAN,
+  ...ABOARD,
+  ...LANTERN,
 ];

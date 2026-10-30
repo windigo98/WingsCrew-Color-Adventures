@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-17T08:13:05.344Z",
+  "generatedAt": "2026-10-30T11:05:47.991Z",
   "pictures": [
     {
       "id": "sunny-dragon",
@@ -13,7 +13,7 @@
         "total": 25600,
         "regions": 24
       },
-      "ms": 116
+      "ms": 119
     },
     {
       "id": "fantasy-castle",
@@ -27,7 +27,7 @@
         "total": 25600,
         "regions": 23
       },
-      "ms": 78
+      "ms": 89
     },
     {
       "id": "meadow-fox",
@@ -41,7 +41,7 @@
         "total": 19600,
         "regions": 167
       },
-      "ms": 211
+      "ms": 203
     },
     {
       "id": "forest-walk",
@@ -55,7 +55,7 @@
         "total": 19600,
         "regions": 202
       },
-      "ms": 179
+      "ms": 194
     },
     {
       "id": "ocean-fish",
@@ -69,7 +69,7 @@
         "total": 19600,
         "regions": 179
       },
-      "ms": 192
+      "ms": 180
     },
     {
       "id": "baby-phoenix",
@@ -83,7 +83,7 @@
         "total": 25600,
         "regions": 13
       },
-      "ms": 62
+      "ms": 63
     },
     {
       "id": "unicorn-meadow",
@@ -97,7 +97,7 @@
         "total": 25600,
         "regions": 18
       },
-      "ms": 41
+      "ms": 42
     },
     {
       "id": "sea-serpent",
@@ -111,7 +111,7 @@
         "total": 19600,
         "regions": 180
       },
-      "ms": 156
+      "ms": 153
     },
     {
       "id": "griffin-perch",
@@ -125,7 +125,7 @@
         "total": 19600,
         "regions": 207
       },
-      "ms": 145
+      "ms": 154
     },
     {
       "id": "night-owl",
@@ -139,7 +139,7 @@
         "total": 19600,
         "regions": 166
       },
-      "ms": 149
+      "ms": 152
     },
     {
       "id": "phoenix-rise",
@@ -153,7 +153,7 @@
         "total": 19600,
         "regions": 1311
       },
-      "ms": 461
+      "ms": 458
     },
     {
       "id": "dragon-queen",
@@ -167,7 +167,7 @@
         "total": 19600,
         "regions": 2113
       },
-      "ms": 557
+      "ms": 550
     },
     {
       "id": "celestial-wolf",
@@ -181,7 +181,7 @@
         "total": 19600,
         "regions": 1607
       },
-      "ms": 483
+      "ms": 492
     },
     {
       "id": "jolly-tree",
@@ -195,7 +195,7 @@
         "total": 25600,
         "regions": 14
       },
-      "ms": 33
+      "ms": 30
     },
     {
       "id": "snow-friend",
@@ -223,7 +223,7 @@
         "total": 19600,
         "regions": 157
       },
-      "ms": 136
+      "ms": 147
     },
     {
       "id": "cozy-wreath",
@@ -237,7 +237,7 @@
         "total": 19600,
         "regions": 148
       },
-      "ms": 120
+      "ms": 135
     },
     {
       "id": "sleigh-ride",
@@ -251,7 +251,7 @@
         "total": 19600,
         "regions": 219
       },
-      "ms": 174
+      "ms": 173
     },
     {
       "id": "pumpkin-patch",
@@ -265,7 +265,7 @@
         "total": 25600,
         "regions": 16
       },
-      "ms": 32
+      "ms": 33
     },
     {
       "id": "friendly-ghost",
@@ -279,7 +279,7 @@
         "total": 25600,
         "regions": 11
       },
-      "ms": 28
+      "ms": 30
     },
     {
       "id": "black-cat",
@@ -293,7 +293,7 @@
         "total": 19600,
         "regions": 146
       },
-      "ms": 136
+      "ms": 149
     },
     {
       "id": "haunted-house",
@@ -307,7 +307,7 @@
         "total": 19600,
         "regions": 207
       },
-      "ms": 164
+      "ms": 161
     },
     {
       "id": "moon-bats",
@@ -321,7 +321,7 @@
         "total": 19600,
         "regions": 160
       },
-      "ms": 140
+      "ms": 194
     },
     {
       "id": "skull-garden",
@@ -335,7 +335,231 @@
         "total": 19600,
         "regions": 1406
       },
-      "ms": 441
+      "ms": 506
+    },
+    {
+      "id": "friendly-whale",
+      "pack": "ocean",
+      "tier": "little",
+      "regions": 21,
+      "colors": 14,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 25600,
+        "regions": 21
+      },
+      "ms": 55
+    },
+    {
+      "id": "starfish-pool",
+      "pack": "ocean",
+      "tier": "little",
+      "regions": 16,
+      "colors": 12,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 25600,
+        "regions": 16
+      },
+      "ms": 50
+    },
+    {
+      "id": "coral-palace",
+      "pack": "ocean",
+      "tier": "big",
+      "regions": 200,
+      "colors": 13,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 200
+      },
+      "ms": 123
+    },
+    {
+      "id": "dolphin-leap",
+      "pack": "ocean",
+      "tier": "big",
+      "regions": 186,
+      "colors": 12,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 186
+      },
+      "ms": 127
+    },
+    {
+      "id": "seahorse-garden",
+      "pack": "ocean",
+      "tier": "big",
+      "regions": 189,
+      "colors": 12,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 189
+      },
+      "ms": 167
+    },
+    {
+      "id": "reef-glow",
+      "pack": "ocean",
+      "tier": "adult",
+      "regions": 1554,
+      "colors": 15,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 1554
+      },
+      "ms": 463
+    },
+    {
+      "id": "steam-friend",
+      "pack": "aboard",
+      "tier": "little",
+      "regions": 29,
+      "colors": 18,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 25600,
+        "regions": 29
+      },
+      "ms": 51
+    },
+    {
+      "id": "bridge-crossing",
+      "pack": "aboard",
+      "tier": "little",
+      "regions": 28,
+      "colors": 17,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 25600,
+        "regions": 28
+      },
+      "ms": 54
+    },
+    {
+      "id": "colorful-cars",
+      "pack": "aboard",
+      "tier": "little",
+      "regions": 36,
+      "colors": 21,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 25600,
+        "regions": 36
+      },
+      "ms": 47
+    },
+    {
+      "id": "station-stop",
+      "pack": "aboard",
+      "tier": "little",
+      "regions": 28,
+      "colors": 20,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 25600,
+        "regions": 28
+      },
+      "ms": 47
+    },
+    {
+      "id": "tunnel-hello",
+      "pack": "aboard",
+      "tier": "little",
+      "regions": 36,
+      "colors": 19,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 25600,
+        "regions": 36
+      },
+      "ms": 45
+    },
+    {
+      "id": "moon-caboose",
+      "pack": "aboard",
+      "tier": "little",
+      "regions": 23,
+      "colors": 14,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 25600,
+        "regions": 23
+      },
+      "ms": 46
+    },
+    {
+      "id": "moon-hare",
+      "pack": "lantern",
+      "tier": "adult",
+      "regions": 1406,
+      "colors": 13,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 1406
+      },
+      "ms": 493
+    },
+    {
+      "id": "clock-garden",
+      "pack": "lantern",
+      "tier": "adult",
+      "regions": 1658,
+      "colors": 12,
+      "coverage": {
+        "miss": 0,
+        "multi": 1,
+        "total": 19600,
+        "regions": 1658
+      },
+      "ms": 455
+    },
+    {
+      "id": "peacock-gate",
+      "pack": "lantern",
+      "tier": "adult",
+      "regions": 1504,
+      "colors": 13,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 1504
+      },
+      "ms": 412
+    },
+    {
+      "id": "glass-butterfly",
+      "pack": "lantern",
+      "tier": "adult",
+      "regions": 1480,
+      "colors": 12,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 19600,
+        "regions": 1480
+      },
+      "ms": 358
     },
     {
       "id": "garden-mandala",
@@ -349,7 +573,7 @@
         "total": 14400,
         "regions": 1244
       },
-      "ms": 86
+      "ms": 91
     },
     {
       "id": "lotus-dawn",
@@ -363,7 +587,7 @@
         "total": 14400,
         "regions": 1669
       },
-      "ms": 95
+      "ms": 98
     },
     {
       "id": "star-gate",
@@ -377,7 +601,7 @@
         "total": 14400,
         "regions": 1854
       },
-      "ms": 103
+      "ms": 108
     },
     {
       "id": "sunburst-gold",
@@ -391,7 +615,7 @@
         "total": 14400,
         "regions": 1650
       },
-      "ms": 87
+      "ms": 90
     },
     {
       "id": "indigo-kaleido",
@@ -405,7 +629,7 @@
         "total": 14400,
         "regions": 2310
       },
-      "ms": 118
+      "ms": 122
     },
     {
       "id": "rose-window",
@@ -419,7 +643,7 @@
         "total": 14400,
         "regions": 2466
       },
-      "ms": 126
+      "ms": 129
     },
     {
       "id": "ocean-spiral",
@@ -433,7 +657,7 @@
         "total": 14400,
         "regions": 2060
       },
-      "ms": 108
+      "ms": 113
     },
     {
       "id": "ember-geometry",
@@ -447,7 +671,7 @@
         "total": 14400,
         "regions": 2616
       },
-      "ms": 133
+      "ms": 135
     },
     {
       "id": "moon-petal",
@@ -461,7 +685,7 @@
         "total": 14400,
         "regions": 196
       },
-      "ms": 23
+      "ms": 20
     },
     {
       "id": "ornament-mandala",
@@ -475,7 +699,7 @@
         "total": 14400,
         "regions": 1309
       },
-      "ms": 77
+      "ms": 81
     },
     {
       "id": "skull-mandala",
@@ -489,7 +713,49 @@
         "total": 14400,
         "regions": 1410
       },
-      "ms": 80
+      "ms": 81
+    },
+    {
+      "id": "pearl-window",
+      "pack": "ocean",
+      "tier": "adult",
+      "regions": 1549,
+      "colors": 8,
+      "coverage": {
+        "miss": 2,
+        "multi": 0,
+        "total": 14400,
+        "regions": 1549
+      },
+      "ms": 90
+    },
+    {
+      "id": "amber-compass",
+      "pack": "lantern",
+      "tier": "adult",
+      "regions": 1704,
+      "colors": 8,
+      "coverage": {
+        "miss": 2,
+        "multi": 1,
+        "total": 14400,
+        "regions": 1704
+      },
+      "ms": 96
+    },
+    {
+      "id": "fern-rose",
+      "pack": "lantern",
+      "tier": "adult",
+      "regions": 1915,
+      "colors": 8,
+      "coverage": {
+        "miss": 0,
+        "multi": 0,
+        "total": 14400,
+        "regions": 1915
+      },
+      "ms": 106
     }
   ]
 }

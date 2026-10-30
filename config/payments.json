@@ -7,7 +7,7 @@
       "id": "full-unlock",
       "name": "Full Unlock",
       "price": 4.99,
-      "blurb": "All four launch packs and photo-to-puzzle, on this device, forever.",
+      "blurb": "The four launch packs (Creatures, Mandalas, Christmas, and Halloween) and photo-to-puzzle. Packs added later are separate, or included with All Future Packs.",
       "unlocks": ["creatures", "mandalas", "christmas", "halloween", "photo", "full-unlock"],
       "payhipUrl": "https://payhip.com/TODO/wcca-full-unlock",
       "prefix": "WCCA-FULL",
@@ -67,11 +67,41 @@
       "id": "all-future",
       "name": "All Future Packs",
       "price": 16.99,
-      "blurb": "Every pack now and every pack added later, including photo-to-puzzle.",
-      "unlocks": ["all-future", "photo", "creatures", "mandalas", "christmas", "halloween"],
+      "blurb": "Every pack now and every pack added later, including Ocean Wonders, All Aboard, Lantern Gallery, and photo-to-puzzle.",
+      "unlocks": ["all-future", "photo", "creatures", "mandalas", "christmas", "halloween", "ocean", "aboard", "lantern"],
       "payhipUrl": "https://payhip.com/TODO/wcca-all-future-packs",
       "prefix": "WCCA-PASS",
       "testCode": "WCCA-PASS-TEST-DEMO-6L1V"
+    },
+    {
+      "id": "ocean",
+      "name": "Ocean Wonders",
+      "price": 2.49,
+      "blurb": "Seven undersea pages, from a big whale to an intricate pearl window.",
+      "unlocks": ["ocean"],
+      "payhipUrl": "https://payhip.com/TODO/wcca-ocean",
+      "prefix": "WCCA-OCEA",
+      "testCode": "WCCA-OCEA-TEST-DEMO-9K3B"
+    },
+    {
+      "id": "aboard",
+      "name": "All Aboard",
+      "price": 1.99,
+      "blurb": "Six train pages with big shapes for little kids.",
+      "unlocks": ["aboard"],
+      "payhipUrl": "https://payhip.com/TODO/wcca-aboard",
+      "prefix": "WCCA-ABRD",
+      "testCode": "WCCA-ABRD-TEST-DEMO-4P8D"
+    },
+    {
+      "id": "lantern",
+      "name": "Lantern Gallery",
+      "price": 2.49,
+      "blurb": "Six intricate adult pages: a hare, a clock, a peacock, a butterfly, and two patterns.",
+      "unlocks": ["lantern"],
+      "payhipUrl": "https://payhip.com/TODO/wcca-lantern",
+      "prefix": "WCCA-LANT",
+      "testCode": "WCCA-LANT-TEST-DEMO-1H5N"
     }
   ]
 }

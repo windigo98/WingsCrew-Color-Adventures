@@ -400,6 +400,226 @@
           "bytes": 163827
         }
       ]
+    },
+    {
+      "id": "ocean",
+      "title": "Ocean Wonders",
+      "free": false,
+      "productId": "ocean",
+      "tagline": "An undersea kingdom of whales, coral, and pearls.",
+      "blurb": "A whale, a tide pool, a coral palace, dolphins, a seahorse, and intricate reef pages.",
+      "pictures": [
+        {
+          "id": "friendly-whale",
+          "title": "Friendly Whale",
+          "tier": "little",
+          "regions": 21,
+          "colors": 14,
+          "file": "packs/ocean/friendly-whale.json",
+          "preview": "packs/ocean/previews/friendly-whale.png",
+          "bytes": 7723
+        },
+        {
+          "id": "starfish-pool",
+          "title": "Starfish Pool",
+          "tier": "little",
+          "regions": 16,
+          "colors": 12,
+          "file": "packs/ocean/starfish-pool.json",
+          "preview": "packs/ocean/previews/starfish-pool.png",
+          "bytes": 7179
+        },
+        {
+          "id": "coral-palace",
+          "title": "Coral Palace",
+          "tier": "big",
+          "regions": 200,
+          "colors": 13,
+          "file": "packs/ocean/coral-palace.json",
+          "preview": "packs/ocean/previews/coral-palace.png",
+          "bytes": 49523
+        },
+        {
+          "id": "dolphin-leap",
+          "title": "Dolphin Leap",
+          "tier": "big",
+          "regions": 186,
+          "colors": 12,
+          "file": "packs/ocean/dolphin-leap.json",
+          "preview": "packs/ocean/previews/dolphin-leap.png",
+          "bytes": 46543
+        },
+        {
+          "id": "seahorse-garden",
+          "title": "Seahorse Garden",
+          "tier": "big",
+          "regions": 189,
+          "colors": 12,
+          "file": "packs/ocean/seahorse-garden.json",
+          "preview": "packs/ocean/previews/seahorse-garden.png",
+          "bytes": 47755
+        },
+        {
+          "id": "reef-glow",
+          "title": "Reef Glow",
+          "tier": "adult",
+          "regions": 1554,
+          "colors": 15,
+          "file": "packs/ocean/reef-glow.json",
+          "preview": "packs/ocean/previews/reef-glow.png",
+          "bytes": 329991
+        },
+        {
+          "id": "pearl-window",
+          "title": "Pearl Window",
+          "tier": "adult",
+          "regions": 1549,
+          "colors": 8,
+          "file": "packs/ocean/pearl-window.json",
+          "preview": "packs/ocean/previews/pearl-window.png",
+          "bytes": 182039
+        }
+      ]
+    },
+    {
+      "id": "aboard",
+      "title": "All Aboard",
+      "free": false,
+      "productId": "aboard",
+      "tagline": "Friendly steam trains with big, easy shapes.",
+      "blurb": "A steam engine, a bridge, a train with cars, a station, a tunnel, and a moon caboose.",
+      "pictures": [
+        {
+          "id": "steam-friend",
+          "title": "Steam Friend",
+          "tier": "little",
+          "regions": 29,
+          "colors": 18,
+          "file": "packs/aboard/steam-friend.json",
+          "preview": "packs/aboard/previews/steam-friend.png",
+          "bytes": 10056
+        },
+        {
+          "id": "bridge-crossing",
+          "title": "Bridge Crossing",
+          "tier": "little",
+          "regions": 28,
+          "colors": 17,
+          "file": "packs/aboard/bridge-crossing.json",
+          "preview": "packs/aboard/previews/bridge-crossing.png",
+          "bytes": 10680
+        },
+        {
+          "id": "colorful-cars",
+          "title": "Colorful Cars",
+          "tier": "little",
+          "regions": 36,
+          "colors": 21,
+          "file": "packs/aboard/colorful-cars.json",
+          "preview": "packs/aboard/previews/colorful-cars.png",
+          "bytes": 11036
+        },
+        {
+          "id": "station-stop",
+          "title": "Station Stop",
+          "tier": "little",
+          "regions": 28,
+          "colors": 20,
+          "file": "packs/aboard/station-stop.json",
+          "preview": "packs/aboard/previews/station-stop.png",
+          "bytes": 9540
+        },
+        {
+          "id": "tunnel-hello",
+          "title": "Tunnel Hello",
+          "tier": "little",
+          "regions": 36,
+          "colors": 19,
+          "file": "packs/aboard/tunnel-hello.json",
+          "preview": "packs/aboard/previews/tunnel-hello.png",
+          "bytes": 10880
+        },
+        {
+          "id": "moon-caboose",
+          "title": "Moon Caboose",
+          "tier": "little",
+          "regions": 23,
+          "colors": 14,
+          "file": "packs/aboard/moon-caboose.json",
+          "preview": "packs/aboard/previews/moon-caboose.png",
+          "bytes": 7388
+        }
+      ]
+    },
+    {
+      "id": "lantern",
+      "title": "Lantern Gallery",
+      "free": false,
+      "productId": "lantern",
+      "tagline": "Intricate pages for a long, quiet color.",
+      "blurb": "A moon hare, a clock garden, a peacock gate, a glass butterfly, and two gold patterns.",
+      "pictures": [
+        {
+          "id": "moon-hare",
+          "title": "Moon Hare",
+          "tier": "adult",
+          "regions": 1406,
+          "colors": 13,
+          "file": "packs/lantern/moon-hare.json",
+          "preview": "packs/lantern/previews/moon-hare.png",
+          "bytes": 306449
+        },
+        {
+          "id": "clock-garden",
+          "title": "Clock Garden",
+          "tier": "adult",
+          "regions": 1658,
+          "colors": 12,
+          "file": "packs/lantern/clock-garden.json",
+          "preview": "packs/lantern/previews/clock-garden.png",
+          "bytes": 344229
+        },
+        {
+          "id": "peacock-gate",
+          "title": "Peacock Gate",
+          "tier": "adult",
+          "regions": 1504,
+          "colors": 13,
+          "file": "packs/lantern/peacock-gate.json",
+          "preview": "packs/lantern/previews/peacock-gate.png",
+          "bytes": 322385
+        },
+        {
+          "id": "glass-butterfly",
+          "title": "Glass Butterfly",
+          "tier": "adult",
+          "regions": 1480,
+          "colors": 12,
+          "file": "packs/lantern/glass-butterfly.json",
+          "preview": "packs/lantern/previews/glass-butterfly.png",
+          "bytes": 294133
+        },
+        {
+          "id": "amber-compass",
+          "title": "Amber Compass",
+          "tier": "adult",
+          "regions": 1704,
+          "colors": 8,
+          "file": "packs/lantern/amber-compass.json",
+          "preview": "packs/lantern/previews/amber-compass.png",
+          "bytes": 201969
+        },
+        {
+          "id": "fern-rose",
+          "title": "Fern Rose",
+          "tier": "adult",
+          "regions": 1915,
+          "colors": 8,
+          "file": "packs/lantern/fern-rose.json",
+          "preview": "packs/lantern/previews/fern-rose.png",
+          "bytes": 220853
+        }
+      ]
     }
   ]
 }

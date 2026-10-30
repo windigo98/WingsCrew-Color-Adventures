@@ -53,6 +53,30 @@ const PACKS = [
     tagline: "Friendly frights and autumn evenings.",
     blurb: "Pumpkins, ghosts, a black cat, a haunted house, bats, and a skull mandala.",
   },
+  {
+    id: "ocean",
+    title: "Ocean Wonders",
+    free: false,
+    productId: "ocean",
+    tagline: "An undersea kingdom of whales, coral, and pearls.",
+    blurb: "A whale, a tide pool, a coral palace, dolphins, a seahorse, and intricate reef pages.",
+  },
+  {
+    id: "aboard",
+    title: "All Aboard",
+    free: false,
+    productId: "aboard",
+    tagline: "Friendly steam trains with big, easy shapes.",
+    blurb: "A steam engine, a bridge, a train with cars, a station, a tunnel, and a moon caboose.",
+  },
+  {
+    id: "lantern",
+    title: "Lantern Gallery",
+    free: false,
+    productId: "lantern",
+    tagline: "Intricate pages for a long, quiet color.",
+    blurb: "A moon hare, a clock garden, a peacock gate, a glass butterfly, and two gold patterns.",
+  },
 ];
 
 const RANGES = {
