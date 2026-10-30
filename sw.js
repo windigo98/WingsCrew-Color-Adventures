@@ -1,4 +1,4 @@
-const CACHE = "wcca-v4";
+const CACHE = "wcca-v5";
 
 const SHELL = [
   "./",

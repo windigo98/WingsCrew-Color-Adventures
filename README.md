@@ -49,13 +49,16 @@ This environment could not turn Pages on (the GitHub API for this repo declined 
 | Mandalas & Patterns | $2.99 | 8, mostly adult (up to 2,616 regions) |
 | Christmas | $1.99 | 6 |
 | Halloween | $1.99 | 7 (a pictorial adult page and a skull mandala) |
-| Full Unlock | $4.99 once | Creatures, Mandalas, Christmas, Halloween, and photo-to-puzzle |
+| Ocean Wonders | $2.49 | 7, mixed: whale and tide pool, three big-kid pages, reef and pearl window |
+| All Aboard | $1.99 | 6 little-kid trains with big regions |
+| Lantern Gallery | $2.49 | 6 intricate adult pages |
+| Full Unlock | $4.99 once | The four launch packs only: Creatures, Mandalas, Christmas, Halloween, and photo-to-puzzle |
 | Storybook Bundle | $5.99 once | Creatures, Christmas, and Halloween |
-| All Future Packs | $16.99 once | Everything above, plus packs added later |
+| All Future Packs | $16.99 once | Every pack, including Ocean Wonders, All Aboard, Lantern Gallery, and packs added later |
 
 Prices are one-time. There is no subscription. On the web, a real charge comes from Payhip, not from this app. The app never sees a card number.
 
-`node tools/check-packs.mjs` loads every picture (decrypting paid packs), checks each region for a palette index, a path, and a label point inside the region, and samples the page for gaps and overlaps. The latest run checked **35 pictures, 0 failed**. Details are in `docs/check-report.json`. Pictorial pages sampled with 0 missed cells. A few mandalas show a hairline miss or overlap under 0.1% of samples, inside the 0.4% allowance. That allowance is for edge rays on shared borders, not for open holes.
+`node tools/check-packs.mjs` loads every picture (decrypting paid packs), checks each region for a palette index, a path, and a label point inside the region, and samples the page for gaps and overlaps. The latest run checked **54 pictures, 0 failed**. Details are in `docs/check-report.json`. Pictorial pages sampled with 0 missed cells. A few mandalas show a hairline miss or overlap under 0.1% of samples, inside the 0.4% allowance. That allowance is for edge rays on shared borders, not for open holes.
 
 ## Picture format
 
@@ -104,6 +107,9 @@ Practice codes, also listed in `config/payments.json`:
 | Halloween | `WCCA-HALL-TEST-DEMO-7N4C` |
 | Storybook Bundle | `WCCA-BND3-TEST-DEMO-2Y8F` |
 | All Future Packs | `WCCA-PASS-TEST-DEMO-6L1V` |
+| Ocean Wonders | `WCCA-OCEA-TEST-DEMO-9K3B` |
+| All Aboard | `WCCA-ABRD-TEST-DEMO-4P8D` |
+| Lantern Gallery | `WCCA-LANT-TEST-DEMO-1H5N` |
 
 Codes are checked offline. The app hashes `WingsCrew-Color-Adventures-v1|` plus the code and compares it to `data/unlock-hashes.json`. That only stops casual copying. A determined person can read the hash list and the test codes.
 

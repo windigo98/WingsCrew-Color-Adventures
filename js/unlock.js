@@ -69,6 +69,7 @@ export function hasAccess(ent, pack) {
   if (!pack || pack.free) return true;
   if (ent.has("all-future")) return true;
   if (ent.has(pack.id)) return true;
+  // Full Unlock stays the four launch packs. Later packs are their own purchase, or All Future Packs.
   if (ent.has("full-unlock") && pack.productId && pack.productId !== "all-future") {
     return ["creatures", "mandalas", "christmas", "halloween"].includes(pack.id);
   }

@@ -485,5 +485,79 @@ export function mandalaEntries() {
     ],
   };
 
-  return [garden, lotus, star, sunburst, indigo, rose, ocean, ember, moon, ornament, skullRing];
+  const pearl = {
+    id: "pearl-window",
+    pack: "ocean",
+    title: "Pearl Window",
+    tier: "adult",
+    minCount: 1000,
+    aim: 1500,
+    maxCount: 2100,
+    fine: 120,
+    frameStep: 5,
+    palette: pal("foam", "sky", "sea", "navy", "gold", "cream", "teal", "blush"),
+    framePaint: (i) => (i % 2 ? 3 : 2),
+    rings: [
+      row(30, 0, 0, 0, 8, () => 4),
+      row(16, 0, 0, 0, 4, (i) => (i % 2 ? 5 : 0)),
+      row(18, 8, 8, 0, 3, (i, n) => (lotusPetal(i, n) ? 6 : 1)),
+      row(12, 0, 0, 0, 2, (i) => [2, 3, 7][i % 3]),
+      row(20, 9, 8, 0.5, 2, (i, n) => (lotusPetal(i, n) ? 4 : 2)),
+      row(14, 0, 0, 0, 1, (i) => (i % 2 ? 5 : 3)),
+      row(18, 6, 16, 0.2, 1, (i, n) => (star16(i, n) ? 6 : 1)),
+      row(16, 0, 0, 0, 1, (i, n) => (lotusPetal(i, n) ? 4 : 0)),
+    ],
+  };
+
+  const amber = {
+    id: "amber-compass",
+    pack: "lantern",
+    title: "Amber Compass",
+    tier: "adult",
+    minCount: 1000,
+    aim: 1700,
+    maxCount: 2300,
+    fine: 144,
+    frameStep: 6,
+    palette: pal("night", "gold", "amber", "cream", "navy", "rust", "indigo", "moon"),
+    framePaint: (i) => (i % 2 ? 0 : 4),
+    rings: [
+      row(24, 0, 0, 0, 12, () => 1),
+      row(14, 6, 12, 0, 4, (i, n) => (star12(i, n) ? 2 : 4)),
+      row(12, 0, 0, 0, 3, (i) => (i % 2 ? 3 : 7)),
+      row(18, 8, 12, 0.25, 2, (i, n) => (star12(i, n) ? 5 : 0)),
+      row(12, 0, 0, 0, 2, (i) => [1, 6, 2][i % 3]),
+      row(16, 5, 12, 0.8, 1, (i, n) => (star12(i, n) ? 1 : 4)),
+      row(14, 0, 0, 0, 1, (i, n) => (star12(i, n) ? 2 : 7)),
+      row(18, 7, 24, 0, 1, (i, n) => (petal(24, 0.32)(i, n) ? 3 : 0)),
+      row(14, 0, 0, 0, 1, (i) => (i % 3 === 0 ? 1 : 6)),
+    ],
+  };
+
+  const fern = {
+    id: "fern-rose",
+    pack: "lantern",
+    title: "Fern Rose",
+    tier: "adult",
+    minCount: 1000,
+    aim: 1800,
+    maxCount: 2400,
+    fine: 120,
+    frameStep: 4,
+    palette: pal("cream", "leaf", "pine", "rose", "blush", "gold", "navy", "sky"),
+    framePaint: (i) => (i % 2 ? 6 : 0),
+    rings: [
+      row(26, 0, 0, 0, 8, () => 5),
+      row(16, 7, 8, 0, 4, (i, n) => (lotusPetal(i, n) ? 3 : 4)),
+      row(12, 0, 0, 0, 3, (i) => (i % 2 ? 1 : 2)),
+      row(20, 9, 8, 0.35, 2, (i, n) => (lotusPetal(i, n) ? 5 : 7)),
+      row(12, 0, 0, 0, 2, (i) => (i % 3 === 0 ? 3 : 0)),
+      row(18, 6, 16, 0, 1, (i, n) => (star16(i, n) ? 1 : 2)),
+      row(14, 0, 0, 0, 1, (i, n) => (lotusPetal(i, n) ? 3 : 6)),
+      row(16, 8, 8, 0.9, 1, (i, n) => (lotusPetal(i, n) ? 5 : 1)),
+      row(14, 4, 6, 0.2, 1, (i, n) => (star6(i, n) ? 3 : 0)),
+    ],
+  };
+
+  return [garden, lotus, star, sunburst, indigo, rose, ocean, ember, moon, ornament, skullRing, pearl, amber, fern];
 }
