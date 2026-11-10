@@ -1,6 +1,17 @@
 import { app, TIER_LABEL, asset } from "./state.js";
 import { Board } from "./renderer.js";
 import { getProgress, saveProgress } from "./db.js";
+
+export function progressFits(progress, picture) {
+  if (!progress || !picture) return false;
+  const count = picture.regions.length;
+  if (picture.rev && progress.rev && progress.rev !== picture.rev) return false;
+  if (Number.isInteger(progress.total) && progress.total !== count) return false;
+  for (const index of progress.filled || []) {
+    if (!Number.isInteger(index) || index < 0 || index >= count) return false;
+  }
+  return true;
+}
 import { parentGate, studioLink } from "./gate.js";
 import { LOUPE_PAN_SLOP, loupeOffset, nextRegion, patternId } from "./aids.js";
 
@@ -90,7 +101,23 @@ export async function openPlay(root, picture, meta) {
   board.load(picture);
   const progress = await getProgress(meta.id);
   if (!alive) return;
-  board.applyState(progress);
+  if (progressFits(progress, picture)) board.applyState(progress);
+  else {
+    board.applyState(null);
+    if (progress) {
+      const snap = board.snapshot();
+      await saveProgress({
+        id: meta.id,
+        title: meta.title,
+        tier: meta.tier,
+        pack: meta.pack || null,
+        updatedAt: Date.now(),
+        total: board.regions.length,
+        rev: picture.rev || 1,
+        ...snap,
+      });
+    }
+  }
   board.fit();
   board.requestDraw();
   window.__WCCA = window.__WCCA || {};
@@ -149,6 +176,7 @@ function scheduleSave(meta) {
       pack: meta.pack || null,
       updatedAt: Date.now(),
       total: board.regions.length,
+      rev: meta.rev || board.picture?.rev || 1,
       ...snap,
     });
   }, 80);
@@ -569,6 +597,7 @@ function bindPlay(root, picture, meta) {
         title: meta.title,
         tier: meta.tier,
         pack: meta.pack || null,
+        rev: meta.rev || board.picture?.rev || 1,
         updatedAt: Date.now(),
         total: board.regions.length,
         ...snap,

@@ -1,5 +1,5 @@
-import { app, TIER_LABEL, asset } from "./state.js";
-import { allProgress, getPhoto } from "./db.js";
+import { app, TIER_LABEL, asset, RETIRED_PICTURE_IDS } from "./state.js";
+import { allProgress, deleteProgress, getPhoto } from "./db.js";
 import { entitlements, hasAccess, canUsePhoto } from "./unlock.js";
 import { openPlay, closePlay } from "./play.js";
 import { renderShop, renderHow, renderCheckout } from "./shop.js";
@@ -68,6 +68,7 @@ async function boot() {
   app.catalog = await catalogRes.json();
   app.payments = await payRes.json();
   app.ent = ent;
+  await retireReplacedPictures();
   applyMotion();
   const motion = motionQuery();
   const onMotionChange = () => {
@@ -87,6 +88,13 @@ async function boot() {
     ready: true,
     requestPersistentStorage,
   });
+}
+
+async function retireReplacedPictures() {
+  const rows = await allProgress();
+  for (const row of rows) {
+    if (RETIRED_PICTURE_IDS.has(row.id)) await deleteProgress(row.id);
+  }
 }
 
 function registerSW() {
@@ -147,7 +155,10 @@ async function showPlay(id) {
     meta = { id: row.id, title: picture.title, tier: picture.tier, pack: "photo" };
   } else {
     const found = findPicture(id);
-    if (!found) throw new Error("That picture isn't in the library.");
+    if (!found) {
+      if (RETIRED_PICTURE_IDS.has(id)) throw new Error("That page was replaced. Its saved coloring was cleared.");
+      throw new Error("That picture isn't in the library.");
+    }
     if (!hasAccess(app.ent, found.pack)) {
       location.hash = "#/shop";
       return;
@@ -155,7 +166,7 @@ async function showPlay(id) {
     const res = await fetch(asset(found.picture.file));
     const payload = await res.json();
     picture = payload.enc ? await decryptPack(payload) : payload;
-    meta = { id: picture.id, title: picture.title, tier: picture.tier, pack: found.pack.id };
+    meta = { id: picture.id, title: picture.title, tier: picture.tier, pack: found.pack.id, rev: picture.rev || 1 };
   }
   await openPlay(root, picture, meta);
   cleanup = () => closePlay(root);
@@ -185,8 +196,9 @@ async function decryptPack(payload) {
 async function renderHome(root) {
   const progress = await allProgress();
   const photos = canUsePhoto(app.ent) ? await (await import("./db.js")).allPhotos() : [];
+  const knownPictures = new Set(app.catalog.packs.flatMap((pack) => pack.pictures.map((picture) => picture.id)));
   const continueItems = progress
-    .filter((p) => p.filled && p.filled.length && p.filled.length < (p.total || Infinity))
+    .filter((p) => (p.id.startsWith("photo-") || knownPictures.has(p.id)) && p.filled && p.filled.length && p.filled.length < (p.total || Infinity))
     .sort((a, b) => b.updatedAt - a.updatedAt)
     .slice(0, 8);
   const filter = app.tierFilter;
