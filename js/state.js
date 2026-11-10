@@ -21,6 +21,16 @@ export const app = {
   board: null,
 };
 
+/** Picture ids removed when the Christmas pack was redrawn from the approved line art. */
+export const RETIRED_PICTURE_IDS = new Set([
+  "jolly-tree",
+  "snow-friend",
+  "reindeer-flight",
+  "cozy-wreath",
+  "sleigh-ride",
+  "ornament-mandala",
+]);
+
 export const TIER_LABEL = {
   little: "Little Kids",
   big: "Big Kids",

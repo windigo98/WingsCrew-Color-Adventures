@@ -202,9 +202,23 @@ export class Board {
       }
     }
     this.selected = best;
+    this.inkPath = picture.ink ? new Path2D(picture.ink) : null;
     this._paintCache();
     this._paintLines();
     this.rebuildHighlight();
+  }
+
+  _paintInk(ctx, lineWidth) {
+    if (!this.inkPath) return;
+    ctx.save();
+    ctx.fillStyle = INK;
+    ctx.strokeStyle = INK;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.lineWidth = lineWidth;
+    ctx.fill(this.inkPath, "evenodd");
+    if (lineWidth > 0) ctx.stroke(this.inkPath);
+    ctx.restore();
   }
 
   _buildGrid() {
@@ -297,6 +311,7 @@ export class Board {
     ctx.lineCap = "round";
     ctx.lineWidth = this.thickLines ? 2.8 : 1.7;
     for (const r of this.regions) ctx.stroke(r.path);
+    this._paintInk(ctx, this.thickLines ? 2.2 : 1.25);
   }
 
   paintRegion(index) {
@@ -546,11 +561,19 @@ export class Board {
         }
         ctx.globalAlpha = 1;
       }
+      this._paintInk(ctx, (this.thickLines ? 2.2 : 1.25) / this.zoom);
       ctx.restore();
     } else {
       ctx.drawImage(this.cache, this.panX, this.panY, 1000 * this.zoom, 1000 * this.zoom);
       ctx.drawImage(this.lines, this.panX, this.panY, 1000 * this.zoom, 1000 * this.zoom);
       if (this.highlight) ctx.drawImage(this.highlightLayer, this.panX, this.panY, 1000 * this.zoom, 1000 * this.zoom);
+      if (this.inkPath) {
+        ctx.save();
+        ctx.translate(this.panX, this.panY);
+        ctx.scale(this.zoom, this.zoom);
+        this._paintInk(ctx, (this.thickLines ? 2.2 : 1.25) / this.zoom);
+        ctx.restore();
+      }
     }
     if (!this.gesturing) this._drawNumbers(ctx);
   }
@@ -597,6 +620,7 @@ export class Board {
     ctx.lineJoin = "round";
     ctx.lineWidth = this.thickLines ? 2.4 : 1.45;
     for (const r of this.regions) ctx.stroke(r.path);
+    this._paintInk(ctx, this.thickLines ? 2.1 : 1.2);
     if (withNumbers) {
       ctx.fillStyle = INK;
       ctx.textAlign = "center";

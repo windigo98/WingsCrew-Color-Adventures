@@ -111,7 +111,7 @@ function finishRegions(entry, built, res, eps) {
 }
 
 export function toJSON(picture) {
-  return {
+  const json = {
     id: picture.id,
     title: picture.title,
     tier: picture.tier,
@@ -119,4 +119,7 @@ export function toJSON(picture) {
     palette: picture.palette,
     regions: picture.regions.map((r) => ({ c: r.c, d: r.d, x: r.x, y: r.y })),
   };
+  if (picture.rev) json.rev = picture.rev;
+  if (picture.ink) json.ink = picture.ink;
+  return json;
 }

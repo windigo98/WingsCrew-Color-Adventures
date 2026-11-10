@@ -441,28 +441,6 @@ export function mandalaEntries() {
     ],
   };
 
-  const ornament = {
-    id: "ornament-mandala",
-    pack: "christmas",
-    title: "Ornament Mandala",
-    tier: "adult",
-    minCount: 1000,
-    aim: 1250,
-    maxCount: 1700,
-    fine: 120,
-    frameStep: 5,
-    palette: pal("cream", "ruby", "pine", "gold", "night", "sky", "blush"),
-    framePaint: (i) => (i % 2 ? 4 : 0),
-    rings: [
-      row(26, 0, 0, 0, 8, () => 3),
-      row(18, 7, 8, 0, 4, (i, n) => (lotusPetal(i, n) ? 1 : 0)),
-      row(14, 0, 0, 0, 3, (i) => (i % 2 ? 2 : 5)),
-      row(20, 8, 8, 0.3, 2, (i, n) => (lotusPetal(i, n) ? 3 : 1)),
-      row(14, 0, 0, 0, 2, (i) => (i % 2 ? 6 : 4)),
-      row(18, 6, 16, 0, 1, (i, n) => (star16(i, n) ? 3 : 2)),
-    ],
-  };
-
   const skullRing = {
     id: "skull-mandala",
     pack: "halloween",
@@ -559,5 +537,5 @@ export function mandalaEntries() {
     ],
   };
 
-  return [garden, lotus, star, sunburst, indigo, rose, ocean, ember, moon, ornament, skullRing, pearl, amber, fern];
+  return [garden, lotus, star, sunburst, indigo, rose, ocean, ember, moon, skullRing, pearl, amber, fern];
 }

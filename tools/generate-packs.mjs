@@ -3,6 +3,7 @@ import path from "path";
 import { PNG } from "pngjs";
 import { PICTURES } from "./art/scenes.mjs";
 import { mandalaEntries, buildMandala } from "./art/mandalas.mjs";
+import { CHRISTMAS, buildChristmas, writeInkPreview } from "./art/christmas-lineart.mjs";
 import { vectorizePainted, toJSON } from "./lib/picture.mjs";
 import { coverage } from "./lib/coverage.mjs";
 import { obfuscate } from "./lib/crypt.mjs";
@@ -22,36 +23,12 @@ const PACKS = [
     blurb: "A friendly dragon, a castle, a fox, a forest, a koi, and a garden mandala.",
   },
   {
-    id: "creatures",
-    title: "Fantastical Creatures",
-    free: false,
-    productId: "creatures",
-    tagline: "Beasts, birds, and beings from the storybook sky.",
-    blurb: "Phoenixes, a unicorn, a sea serpent, a griffin, an owl, and intricate adult pages.",
-  },
-  {
-    id: "mandalas",
-    title: "Mandalas & Patterns",
-    free: false,
-    productId: "mandalas",
-    tagline: "Slow, intricate patterns for a quiet hour.",
-    blurb: "Lotus, star, sunburst, rose window, and other full-page patterns.",
-  },
-  {
     id: "christmas",
     title: "Christmas",
     free: false,
     productId: "christmas",
-    tagline: "Snow, sleighs, and candle-warm colors.",
-    blurb: "Trees, snow friends, reindeer, wreaths, and a sleigh, plus an ornament mandala.",
-  },
-  {
-    id: "halloween",
-    title: "Halloween",
-    free: false,
-    productId: "halloween",
-    tagline: "Friendly frights and autumn evenings.",
-    blurb: "Pumpkins, ghosts, a black cat, a haunted house, bats, and a skull mandala.",
+    tagline: "Six little-kid pages, warm and easy to color.",
+    blurb: "Santa, a reindeer, a snowman, a tree, a gingerbread cottage, and a penguin.",
   },
   {
     id: "ocean",
@@ -70,12 +47,36 @@ const PACKS = [
     blurb: "A steam engine, a bridge, a train with cars, a station, a tunnel, and a moon caboose.",
   },
   {
+    id: "creatures",
+    title: "Fantastical Creatures",
+    free: false,
+    productId: "creatures",
+    tagline: "Beasts, birds, and beings from the storybook sky.",
+    blurb: "Phoenixes, a unicorn, a sea serpent, a griffin, an owl, and intricate adult pages.",
+  },
+  {
+    id: "mandalas",
+    title: "Mandalas & Patterns",
+    free: false,
+    productId: "mandalas",
+    tagline: "Slow, intricate patterns for a quiet hour.",
+    blurb: "Lotus, star, sunburst, rose window, and other full-page patterns.",
+  },
+  {
     id: "lantern",
     title: "Lantern Gallery",
     free: false,
     productId: "lantern",
     tagline: "Intricate pages for a long, quiet color.",
     blurb: "A moon hare, a clock garden, a peacock gate, a glass butterfly, and two gold patterns.",
+  },
+  {
+    id: "halloween",
+    title: "Halloween",
+    free: false,
+    productId: "halloween",
+    tagline: "Friendly frights and autumn evenings.",
+    blurb: "Pumpkins, ghosts, a black cat, a haunted house, bats, and a skull mandala.",
   },
 ];
 
@@ -213,6 +214,23 @@ for (const entry of PICTURES) {
   console.log(`${picture.regions.length} regions, cov miss ${cov.miss}/${cov.total}, ${Date.now() - t0}ms`);
 }
 
+for (const entry of CHRISTMAS) {
+  if (filter && entry.id !== filter && entry.pack !== filter) continue;
+  const t0 = Date.now();
+  process.stdout.write(`lineart ${entry.id}… `);
+  const built = buildChristmas(entry);
+  const cov = coverage(built.picture.regions, 160);
+  assertPicture(entry, built.picture, cov);
+  pictures.push({
+    entry,
+    picture: built.picture,
+    cov,
+    ms: Date.now() - t0,
+    inkPreview: { traced: built.traced, paint: entry.paint, palette: entry.palette },
+  });
+  console.log(`${built.picture.regions.length} regions, cov miss ${cov.miss}/${cov.total}, ${Date.now() - t0}ms`);
+}
+
 for (const entry of mandalaEntries()) {
   if (filter && entry.id !== filter && entry.pack !== filter) continue;
   const t0 = Date.now();
@@ -225,7 +243,7 @@ for (const entry of mandalaEntries()) {
 }
 
 if (!filter) {
-  const expected = PICTURES.length + mandalaEntries().length;
+  const expected = PICTURES.length + mandalaEntries().length + CHRISTMAS.length;
   if (pictures.length !== expected) throw new Error(`generated ${pictures.length}, expected ${expected}`);
 }
 
@@ -248,7 +266,8 @@ for (const item of pictures) {
     fs.writeFileSync(path.join(dir, fileName), body);
   }
   const preview = path.join(dir, "previews", `${item.entry.id}.png`);
-  if (item.picture.labels) previewFromLabels(item.picture, preview);
+  if (item.inkPreview) writeInkPreview(item.inkPreview.traced, item.inkPreview.paint, item.inkPreview.palette, preview);
+  else if (item.picture.labels) previewFromLabels(item.picture, preview);
   else previewFromRegions(item.picture, preview);
   byPack.get(item.entry.pack).push({
     id: item.picture.id,
@@ -261,6 +280,20 @@ for (const item of pictures) {
     bytes: Buffer.byteLength(encrypted ? fs.readFileSync(path.join(dir, fileName)) : body),
   });
   console.log(`  wrote ${item.entry.pack}/${fileName} (${(Buffer.byteLength(body) / 1024).toFixed(0)} KB json)`);
+}
+
+if (filter === "christmas") {
+  const catalog = JSON.parse(fs.readFileSync(path.join(root, "packs/catalog.json"), "utf8"));
+  const byId = new Map(catalog.packs.map((pack) => [pack.id, pack]));
+  for (const pack of PACKS) {
+    const current = byId.get(pack.id);
+    current.tagline = pack.tagline;
+    current.blurb = pack.blurb;
+    if (pack.id === "christmas") current.pictures = byPack.get("christmas");
+  }
+  catalog.packs = PACKS.map((pack) => byId.get(pack.id));
+  fs.writeFileSync(path.join(root, "packs/catalog.json"), JSON.stringify(catalog, null, 2) + "\n");
+  console.log("catalog updated for christmas");
 }
 
 if (!filter) {

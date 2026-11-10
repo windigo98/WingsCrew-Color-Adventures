@@ -52,6 +52,13 @@ export async function saveProgress(record) {
   await txDone(tx);
 }
 
+export async function deleteProgress(id) {
+  const database = await db();
+  const tx = database.transaction("progress", "readwrite");
+  tx.objectStore("progress").delete(id);
+  await txDone(tx);
+}
+
 export async function getProgress(id) {
   const database = await db();
   return new Promise((resolve, reject) => {
