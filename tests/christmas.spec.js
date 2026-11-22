@@ -21,6 +21,7 @@ const SHELF = [
   "Mandalas & Patterns",
   "Lantern Gallery",
   "Halloween",
+  "Quill Scrolls",
 ];
 
 async function unlockAll(page) {
@@ -49,7 +50,7 @@ test("christmas line art is little-kid coloring and the shelf leads with it", as
   await page.goto("./");
   await expect(page.locator("footer p").first()).toHaveText("© 2026 WingsCrew. All rights reserved.");
   const sw = await page.request.get("./sw.js");
-  expect(await sw.text()).toContain('const CACHE = "wcca-v6"');
+  expect(await sw.text()).toContain('const CACHE = "wcca-v7"');
 
   await unlockAll(page);
   await page.goto("./");

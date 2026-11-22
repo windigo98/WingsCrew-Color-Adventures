@@ -142,6 +142,8 @@ export class Board {
     this.zoom = 1;
     this.panX = 0;
     this.panY = 0;
+    this.worldW = 1000;
+    this.worldH = 1000;
     this.fitZoom = 1;
     this.highlight = true;
     this.selected = 0;
@@ -164,6 +166,9 @@ export class Board {
 
   load(picture) {
     this.picture = picture;
+    const box = picture.viewBox;
+    this.worldW = box && box.length >= 4 ? box[2] - box[0] || 1000 : 1000;
+    this.worldH = box && box.length >= 4 ? box[3] - box[1] || 1000 : 1000;
     this.regions = picture.regions.map((raw, i) => {
       const loops = parseLoops(raw.d);
       let x0 = Infinity;
@@ -203,12 +208,37 @@ export class Board {
     }
     this.selected = best;
     this.inkPath = picture.ink ? new Path2D(picture.ink) : null;
+    this.sourceInk = Boolean(picture.inkPng);
+    this.inkImage = null;
+    this.inkReady = null;
+    if (picture.inkPng) {
+      const img = new Image();
+      this.inkReady = new Promise((resolve) => {
+        img.onload = () => {
+          this.inkImage = img;
+          this._paintLines();
+          this._paintCache();
+          this.rebuildHighlight();
+          this.draw();
+          resolve();
+        };
+        img.onerror = () => resolve();
+      });
+      img.src = "data:image/png;base64," + picture.inkPng;
+    }
     this._paintCache();
     this._paintLines();
     this.rebuildHighlight();
   }
 
   _paintInk(ctx, lineWidth) {
+    if (this.inkImage) {
+      ctx.save();
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(this.inkImage, 0, 0, this.worldW, this.worldH);
+      ctx.restore();
+      return;
+    }
     if (!this.inkPath) return;
     ctx.save();
     ctx.fillStyle = INK;
@@ -244,6 +274,10 @@ export class Board {
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
   }
 
+  _cacheScale() {
+    return this.cacheSize / Math.max(this.worldW, this.worldH);
+  }
+
   styleOf(region) {
     const hex = this.picture.palette[region.c].hex;
     const shade = this.shades[region.i] / 255;
@@ -251,14 +285,13 @@ export class Board {
   }
 
   _paintCache() {
-    const S = this.cacheSize;
-    this.cache.width = S;
-    this.cache.height = S;
+    const scale = this._cacheScale();
+    this.cache.width = Math.max(1, Math.round(this.worldW * scale));
+    this.cache.height = Math.max(1, Math.round(this.worldH * scale));
     const ctx = this.cctx;
-    const scale = S / 1000;
     this._worldTransform(ctx, scale);
     ctx.fillStyle = PAPER;
-    ctx.fillRect(0, 0, 1000, 1000);
+    ctx.fillRect(0, 0, this.worldW, this.worldH);
     for (const r of this.regions) this._fillRegion(ctx, r);
   }
 
@@ -300,26 +333,29 @@ export class Board {
   }
 
   _paintLines() {
-    const S = this.cacheSize;
-    this.lines.width = S;
-    this.lines.height = S;
+    const scale = this._cacheScale();
+    this.lines.width = Math.max(1, Math.round(this.worldW * scale));
+    this.lines.height = Math.max(1, Math.round(this.worldH * scale));
     const ctx = this.lctx;
-    ctx.clearRect(0, 0, S, S);
-    this._worldTransform(ctx, S / 1000);
-    ctx.strokeStyle = INK;
-    ctx.lineJoin = "round";
-    ctx.lineCap = "round";
-    ctx.lineWidth = this.thickLines ? 2.8 : 1.7;
-    for (const r of this.regions) ctx.stroke(r.path);
+    ctx.clearRect(0, 0, this.lines.width, this.lines.height);
+    this._worldTransform(ctx, scale);
+    if (!this.sourceInk) {
+      ctx.strokeStyle = INK;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      ctx.lineWidth = this.thickLines ? 2.8 : 1.7;
+      for (const r of this.regions) ctx.stroke(r.path);
+    }
     this._paintInk(ctx, this.thickLines ? 2.2 : 1.25);
   }
 
   paintRegion(index) {
     const r = this.regions[index];
-    const scale = this.cacheSize / 1000;
+    const scale = this._cacheScale();
     const ctx = this.cctx;
     this._worldTransform(ctx, scale);
     this._fillRegion(ctx, r);
+    if (this.sourceInk) return;
     const lctx = this.lctx;
     this._worldTransform(lctx, scale);
     lctx.strokeStyle = INK;
@@ -328,15 +364,15 @@ export class Board {
   }
 
   rebuildHighlight() {
-    const S = this.cacheSize;
-    this.highlightLayer.width = S;
-    this.highlightLayer.height = S;
+    const scale = this._cacheScale();
+    this.highlightLayer.width = Math.max(1, Math.round(this.worldW * scale));
+    this.highlightLayer.height = Math.max(1, Math.round(this.worldH * scale));
     const ctx = this.hctx;
-    ctx.clearRect(0, 0, S, S);
+    ctx.clearRect(0, 0, this.highlightLayer.width, this.highlightLayer.height);
     if (!this.highlight || this.selected == null) return;
     const color = this.picture.palette[this.selected]?.hex;
     if (!color) return;
-    this._worldTransform(ctx, S / 1000);
+    this._worldTransform(ctx, scale);
     ctx.fillStyle = color;
     ctx.globalAlpha = 0.34;
     ctx.strokeStyle = color;
@@ -366,14 +402,14 @@ export class Board {
     this.cssH = cssH;
     this.dpr = dpr;
     const pad = 12;
-    this.fitZoom = Math.max(0.05, Math.min((cssW - pad * 2) / 1000, (cssH - pad * 2) / 1000));
+    this.fitZoom = Math.max(0.05, Math.min((cssW - pad * 2) / this.worldW, (cssH - pad * 2) / this.worldH));
   }
 
   fit() {
     this.layout();
     this.zoom = this.fitZoom;
-    this.panX = (this.cssW - 1000 * this.zoom) / 2;
-    this.panY = (this.cssH - 1000 * this.zoom) / 2;
+    this.panX = (this.cssW - this.worldW * this.zoom) / 2;
+    this.panY = (this.cssH - this.worldH * this.zoom) / 2;
   }
 
   clampZoom() {
@@ -384,8 +420,8 @@ export class Board {
   }
 
   clampPan() {
-    const w = 1000 * this.zoom;
-    const h = 1000 * this.zoom;
+    const w = this.worldW * this.zoom;
+    const h = this.worldH * this.zoom;
     const m = 36;
     if (w + m * 2 <= this.cssW) this.panX = (this.cssW - w) / 2;
     else this.panX = Math.min(m, Math.max(this.cssW - w - m, this.panX));
@@ -518,7 +554,7 @@ export class Board {
   }
 
   _useVectors(visibleCount) {
-    const picturePx = 1000 * this.zoom * this.dpr;
+    const picturePx = Math.max(this.worldW, this.worldH) * this.zoom * this.dpr;
     const soft = picturePx > this.cacheSize * 1.05;
     if (!soft && visibleCount > 500) return false;
     if (this.gesturing && visibleCount > 380) return false;
@@ -540,13 +576,15 @@ export class Board {
       ctx.translate(this.panX, this.panY);
       ctx.scale(this.zoom, this.zoom);
       ctx.fillStyle = PAPER;
-      ctx.fillRect(0, 0, 1000, 1000);
+      ctx.fillRect(0, 0, this.worldW, this.worldH);
       for (const r of visible) this._fillRegion(ctx, r);
-      ctx.strokeStyle = INK;
-      ctx.lineJoin = "round";
-      ctx.lineCap = "round";
-      ctx.lineWidth = (this.thickLines ? 2.4 : 1.45) / this.zoom;
-      for (const r of visible) ctx.stroke(r.path);
+      if (!this.sourceInk) {
+        ctx.strokeStyle = INK;
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round";
+        ctx.lineWidth = (this.thickLines ? 2.4 : 1.45) / this.zoom;
+        for (const r of visible) ctx.stroke(r.path);
+      }
       if (this.highlight && this.selected != null) {
         const color = this.picture.palette[this.selected].hex;
         ctx.lineWidth = (this.thickLines ? 3.2 : 2.2) / this.zoom;
@@ -564,10 +602,10 @@ export class Board {
       this._paintInk(ctx, (this.thickLines ? 2.2 : 1.25) / this.zoom);
       ctx.restore();
     } else {
-      ctx.drawImage(this.cache, this.panX, this.panY, 1000 * this.zoom, 1000 * this.zoom);
-      ctx.drawImage(this.lines, this.panX, this.panY, 1000 * this.zoom, 1000 * this.zoom);
-      if (this.highlight) ctx.drawImage(this.highlightLayer, this.panX, this.panY, 1000 * this.zoom, 1000 * this.zoom);
-      if (this.inkPath) {
+      ctx.drawImage(this.cache, this.panX, this.panY, this.worldW * this.zoom, this.worldH * this.zoom);
+      ctx.drawImage(this.lines, this.panX, this.panY, this.worldW * this.zoom, this.worldH * this.zoom);
+      if (this.highlight) ctx.drawImage(this.highlightLayer, this.panX, this.panY, this.worldW * this.zoom, this.worldH * this.zoom);
+      if (this.inkPath && !this.sourceInk) {
         ctx.save();
         ctx.translate(this.panX, this.panY);
         ctx.scale(this.zoom, this.zoom);
@@ -604,22 +642,25 @@ export class Board {
   }
 
   exportCanvas(size = 1800, withNumbers = false) {
+    const long = Math.max(this.worldW, this.worldH);
     const c = document.createElement("canvas");
-    c.width = size;
-    c.height = size;
+    c.width = Math.max(1, Math.round((size * this.worldW) / long));
+    c.height = Math.max(1, Math.round((size * this.worldH) / long));
     const ctx = c.getContext("2d");
-    const s = size / 1000;
+    const s = c.width / this.worldW;
     ctx.setTransform(s, 0, 0, s, 0, 0);
     ctx.fillStyle = "#fffdf8";
-    ctx.fillRect(0, 0, 1000, 1000);
+    ctx.fillRect(0, 0, this.worldW, this.worldH);
     for (const r of this.regions) {
       ctx.fillStyle = this.filled[r.i] ? this.styleOf(r) : "#fffdf8";
       ctx.fill(r.path, "evenodd");
     }
-    ctx.strokeStyle = INK;
-    ctx.lineJoin = "round";
-    ctx.lineWidth = this.thickLines ? 2.4 : 1.45;
-    for (const r of this.regions) ctx.stroke(r.path);
+    if (!this.sourceInk) {
+      ctx.strokeStyle = INK;
+      ctx.lineJoin = "round";
+      ctx.lineWidth = this.thickLines ? 2.4 : 1.45;
+      for (const r of this.regions) ctx.stroke(r.path);
+    }
     this._paintInk(ctx, this.thickLines ? 2.1 : 1.2);
     if (withNumbers) {
       ctx.fillStyle = INK;

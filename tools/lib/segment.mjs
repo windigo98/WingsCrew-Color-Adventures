@@ -338,7 +338,7 @@ function splitPixels(pixels, pieces, w) {
 }
 
 /** Pole of inaccessibility on the raster, returned in viewBox space. */
-export function distancePoles(labels, w, h, viewSize) {
+export function distancePoles(labels, w, h, viewSize = 1000, viewHeight) {
   const n = w * h;
   const dist = new Uint16Array(n);
   const qx = new Int32Array(n);
@@ -419,8 +419,10 @@ export function distancePoles(labels, w, h, viewSize) {
       }
     }
   }
-  const sx = viewSize / w;
-  const sy = viewSize / h;
+  const viewW = viewSize && typeof viewSize === "object" ? viewSize.w : viewSize || 1000;
+  const viewH = viewSize && typeof viewSize === "object" ? viewSize.h : viewHeight || viewW;
+  const sx = viewW / w;
+  const sy = viewH / h;
   const out = new Map();
   for (const [id, p] of bestP) {
     out.set(id, {

@@ -228,9 +228,9 @@ function simplifyAll(loopsById, eps) {
   return out;
 }
 
-function scaleLoops(loopsById, w, h, viewSize) {
-  const sx = viewSize / w;
-  const sy = viewSize / h;
+function scaleLoops(loopsById, w, h, viewW, viewH) {
+  const sx = viewW / w;
+  const sy = viewH / h;
   const snap = (v) => Math.round(v * 10) / 10;
   const out = new Map();
   for (const [id, loops] of loopsById) {
@@ -265,14 +265,16 @@ export function loopsToPath(loops) {
  * Returns Map id → { loops, path } in viewBox space.
  */
 export function vectorizeLabels(labels, w, h, viewSize = 1000, eps = 0.8) {
+  const viewW = viewSize && typeof viewSize === "object" ? viewSize.w : viewSize || 1000;
+  const viewH = viewSize && typeof viewSize === "object" ? viewSize.h : viewW;
   const raw = traceRegions(labels, w, h);
   const simp = simplifyAll(raw, eps);
   for (const [id, loops] of raw) {
     if (!simp.has(id)) simp.set(id, loops);
   }
-  const scaled = scaleLoops(simp, w, h, viewSize);
+  const scaled = scaleLoops(simp, w, h, viewW, viewH);
   if (eps > 0) {
-    const rawScaled = scaleLoops(raw, w, h, viewSize);
+    const rawScaled = scaleLoops(raw, w, h, viewW, viewH);
     for (const [id, loops] of rawScaled) {
       if (!scaled.has(id)) scaled.set(id, loops);
     }

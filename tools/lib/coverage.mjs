@@ -1,8 +1,9 @@
 import { pointInLoops } from "../../js/geom.js";
 
 /** Sample the viewBox. A cell counts as a gap only when the center misses. */
-export function coverage(regions, res = 200) {
-  const cell = 1000 / 20;
+export function coverage(regions, res = 200, viewW = 1000, viewH = viewW) {
+  const cellX = viewW / 20;
+  const cellY = viewH / 20;
   const grid = new Map();
   const boxes = regions.map((r, idx) => {
     let x0 = Infinity;
@@ -17,10 +18,10 @@ export function coverage(regions, res = 200) {
         if (y > y1) y1 = y;
       }
     }
-    const gx0 = Math.max(0, Math.floor(x0 / cell));
-    const gy0 = Math.max(0, Math.floor(y0 / cell));
-    const gx1 = Math.min(19, Math.floor(x1 / cell));
-    const gy1 = Math.min(19, Math.floor(y1 / cell));
+    const gx0 = Math.max(0, Math.floor(x0 / cellX));
+    const gy0 = Math.max(0, Math.floor(y0 / cellY));
+    const gx1 = Math.min(19, Math.floor(x1 / cellX));
+    const gy1 = Math.min(19, Math.floor(y1 / cellY));
     for (let gy = gy0; gy <= gy1; gy++) {
       for (let gx = gx0; gx <= gx1; gx++) {
         const k = gx + gy * 20;
@@ -34,13 +35,14 @@ export function coverage(regions, res = 200) {
 
   let miss = 0;
   let multi = 0;
-  const step = 1000 / res;
+  const stepX = viewW / res;
+  const stepY = viewH / res;
   for (let j = 0; j < res; j++) {
-    const y = (j + 0.5) * step;
-    const gy = Math.min(19, Math.floor(y / cell));
+    const y = (j + 0.5) * stepY;
+    const gy = Math.min(19, Math.floor(y / cellY));
     for (let i = 0; i < res; i++) {
-      const x = (i + 0.5) * step;
-      const gx = Math.min(19, Math.floor(x / cell));
+      const x = (i + 0.5) * stepX;
+      const gx = Math.min(19, Math.floor(x / cellX));
       const bucket = grid.get(gx + gy * 20) || [];
       let hits = 0;
       for (const idx of bucket) {

@@ -73,7 +73,7 @@ test("new packs stay locked under Full Unlock, then render and color", async ({ 
       ids: packs.flatMap((pack) => pack.pictures.map((picture) => picture.id)),
     };
   });
-  expect(catalog.pictures).toBe(54);
+  expect(catalog.pictures).toBe(62);
   for (const [id] of NEW_PICTURES) expect(catalog.ids).toContain(id);
 
   await unlock(page, "WCCA-FULL-TEST-DEMO-4K7Q");

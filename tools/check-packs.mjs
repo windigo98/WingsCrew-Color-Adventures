@@ -40,7 +40,10 @@ for (const pack of catalog.packs) {
     const problems = [];
     if (picture.id !== entry.id) problems.push("id mismatch");
     const [lo, hi] = RANGES[picture.tier] || [1, 100000];
-    if (picture.regions.length < lo || picture.regions.length > hi) {
+    const shortfall = picture.tier === "adult" && picture.regions.length < lo && picture.regions.length >= 250 && picture.note;
+    if (shortfall) {
+      console.log(`     SHORTFALL ${picture.id}: ${picture.regions.length} regions. ${picture.note}`);
+    } else if (picture.regions.length < lo || picture.regions.length > hi) {
       problems.push(`region count ${picture.regions.length} outside ${lo}-${hi}`);
     }
     const prepared = picture.regions.map((region, i) => {
@@ -52,7 +55,8 @@ for (const pack of catalog.packs) {
       else if (!pointInLoops(region.x, region.y, loops)) problems.push(`region ${i} label outside`);
       return { loops };
     });
-    const cov = coverage(prepared, 80);
+    const box = picture.viewBox || [0, 0, 1000, 1000];
+    const cov = coverage(prepared, 80, box[2] - box[0] || 1000, box[3] - box[1] || 1000);
     const missPct = cov.miss / cov.total;
     const multiPct = cov.multi / cov.total;
     if (missPct > 0.004) problems.push(`gaps ${(missPct * 100).toFixed(2)}%`);

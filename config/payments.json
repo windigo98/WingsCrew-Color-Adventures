@@ -67,8 +67,8 @@
       "id": "all-future",
       "name": "All Future Packs",
       "price": 16.99,
-      "blurb": "Every pack now and every pack added later, including Ocean Wonders, All Aboard, Lantern Gallery, and photo-to-puzzle.",
-      "unlocks": ["all-future", "photo", "creatures", "mandalas", "christmas", "halloween", "ocean", "aboard", "lantern"],
+      "blurb": "Every pack now and every pack added later, including Ocean Wonders, All Aboard, Lantern Gallery, Quill Scrolls, and photo-to-puzzle.",
+      "unlocks": ["all-future", "photo", "creatures", "mandalas", "christmas", "halloween", "ocean", "aboard", "lantern", "quill"],
       "payhipUrl": "https://payhip.com/TODO/wcca-all-future-packs",
       "prefix": "WCCA-PASS",
       "testCode": "WCCA-PASS-TEST-DEMO-6L1V"
@@ -102,6 +102,16 @@
       "payhipUrl": "https://payhip.com/TODO/wcca-lantern",
       "prefix": "WCCA-LANT",
       "testCode": "WCCA-LANT-TEST-DEMO-1H5N"
+    },
+    {
+      "id": "quill",
+      "name": "Quill Scrolls",
+      "price": 2.99,
+      "blurb": "Eight hand-inked adult pages, from a dragon and phoenix to feathered wings.",
+      "unlocks": ["quill"],
+      "payhipUrl": "https://payhip.com/TODO/wcca-quill",
+      "prefix": "WCCA-QUIL",
+      "testCode": "WCCA-QUIL-TEST-DEMO-8Q2S"
     }
   ]
 }

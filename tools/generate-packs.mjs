@@ -4,6 +4,7 @@ import { PNG } from "pngjs";
 import { PICTURES } from "./art/scenes.mjs";
 import { mandalaEntries, buildMandala } from "./art/mandalas.mjs";
 import { CHRISTMAS, buildChristmas, writeInkPreview } from "./art/christmas-lineart.mjs";
+import { QUILL, buildQuill } from "./art/quill-lineart.mjs";
 import { vectorizePainted, toJSON } from "./lib/picture.mjs";
 import { coverage } from "./lib/coverage.mjs";
 import { obfuscate } from "./lib/crypt.mjs";
@@ -77,6 +78,14 @@ const PACKS = [
     productId: "halloween",
     tagline: "Friendly frights and autumn evenings.",
     blurb: "Pumpkins, ghosts, a black cat, a haunted house, bats, and a skull mandala.",
+  },
+  {
+    id: "quill",
+    title: "Quill Scrolls",
+    free: false,
+    productId: "quill",
+    tagline: "Eight hand-inked pages for a long, quiet color.",
+    blurb: "A dragon and phoenix, a forest, a sea turtle, butterflies, a floating castle, a winter cabin, the sun and moon, and feathered wings.",
   },
 ];
 
@@ -231,6 +240,24 @@ for (const entry of CHRISTMAS) {
   console.log(`${built.picture.regions.length} regions, cov miss ${cov.miss}/${cov.total}, ${Date.now() - t0}ms`);
 }
 
+for (const entry of QUILL) {
+  if (filter && entry.id !== filter && entry.pack !== filter) continue;
+  const t0 = Date.now();
+  process.stdout.write(`quill ${entry.id}… `);
+  const built = buildQuill(entry);
+  assertPicture(entry, built.picture, built.coverage);
+  pictures.push({
+    entry,
+    picture: built.picture,
+    cov: built.coverage,
+    ms: Date.now() - t0,
+    inkPreview: { traced: built.traced, paint: built.colors, palette: entry.palette },
+  });
+  console.log(
+    `${built.picture.regions.length} regions, cov miss ${built.coverage.miss}/${built.coverage.total}, ${Date.now() - t0}ms`
+  );
+}
+
 for (const entry of mandalaEntries()) {
   if (filter && entry.id !== filter && entry.pack !== filter) continue;
   const t0 = Date.now();
@@ -243,7 +270,7 @@ for (const entry of mandalaEntries()) {
 }
 
 if (!filter) {
-  const expected = PICTURES.length + mandalaEntries().length + CHRISTMAS.length;
+  const expected = PICTURES.length + mandalaEntries().length + CHRISTMAS.length + QUILL.length;
   if (pictures.length !== expected) throw new Error(`generated ${pictures.length}, expected ${expected}`);
 }
 
@@ -282,18 +309,22 @@ for (const item of pictures) {
   console.log(`  wrote ${item.entry.pack}/${fileName} (${(Buffer.byteLength(body) / 1024).toFixed(0)} KB json)`);
 }
 
-if (filter === "christmas") {
+if (filter === "christmas" || filter === "quill") {
   const catalog = JSON.parse(fs.readFileSync(path.join(root, "packs/catalog.json"), "utf8"));
   const byId = new Map(catalog.packs.map((pack) => [pack.id, pack]));
   for (const pack of PACKS) {
-    const current = byId.get(pack.id);
+    let current = byId.get(pack.id);
+    if (!current) {
+      current = { ...pack, pictures: [] };
+      byId.set(pack.id, current);
+    }
     current.tagline = pack.tagline;
     current.blurb = pack.blurb;
-    if (pack.id === "christmas") current.pictures = byPack.get("christmas");
+    if (pack.id === filter) current.pictures = byPack.get(filter);
   }
   catalog.packs = PACKS.map((pack) => byId.get(pack.id));
   fs.writeFileSync(path.join(root, "packs/catalog.json"), JSON.stringify(catalog, null, 2) + "\n");
-  console.log("catalog updated for christmas");
+  console.log("catalog updated for " + filter);
 }
 
 if (!filter) {
