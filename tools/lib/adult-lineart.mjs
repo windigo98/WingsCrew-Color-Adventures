@@ -407,6 +407,20 @@ function assignInk(labels, w, h) {
   for (let i = 0; i < n; i++) if (labels[i] < 0) labels[i] = fallback;
 }
 
+/** Darkness of the source pixels, 0 on paper. This is the ink overlay, with no thickening. */
+export function sourceInkAlpha(png) {
+  const n = png.width * png.height;
+  const alpha = new Uint8Array(n);
+  const data = png.data;
+  for (let p = 0, i = 0; p < n; p++, i += 4) {
+    if (data[i + 3] < 128) continue;
+    const lum = 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
+    const a = 255 - lum;
+    alpha[p] = a <= 0 ? 0 : a >= 255 ? 255 : a | 0;
+  }
+  return alpha;
+}
+
 export function traceAdult(png, opt = {}) {
   const thresh = opt.thresh ?? 160;
   const close = opt.close ?? 1;

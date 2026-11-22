@@ -120,7 +120,8 @@ export function toJSON(picture) {
     regions: picture.regions.map((r) => ({ c: r.c, d: r.d, x: r.x, y: r.y })),
   };
   if (picture.rev) json.rev = picture.rev;
-  if (picture.ink) json.ink = picture.ink;
+  if (picture.inkPng) json.inkPng = picture.inkPng;
+  else if (picture.ink) json.ink = picture.ink;
   if (picture.note) json.note = picture.note;
   return json;
 }

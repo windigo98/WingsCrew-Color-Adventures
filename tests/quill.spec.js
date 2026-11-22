@@ -4,14 +4,14 @@ import path from "node:path";
 const shotDir = "/opt/cursor/artifacts/quill";
 
 const QUILL = [
-  ["dragon-phoenix", "Dragon and Phoenix", 894, true],
-  ["forest-hollow", "Forest Hollow", 948, false],
-  ["turtle-tide", "Turtle Tide", 840, true],
-  ["butterfly-garden", "Butterfly Garden", 866, true],
-  ["floating-castle", "Floating Castle", 1094, false],
-  ["winter-cabin", "Winter Cabin", 1008, false],
-  ["sun-and-moon", "Sun and Moon", 335, false],
-  ["feathered-wings", "Feathered Wings", 437, false],
+  ["dragon-phoenix", "Dragon and Phoenix", 816, true],
+  ["forest-hollow", "Forest Hollow", 803, true],
+  ["turtle-tide", "Turtle Tide", 557, true],
+  ["butterfly-garden", "Butterfly Garden", 673, true],
+  ["floating-castle", "Floating Castle", 863, false],
+  ["winter-cabin", "Winter Cabin", 900, false],
+  ["sun-and-moon", "Sun and Moon", 301, false],
+  ["feathered-wings", "Feathered Wings", 355, false],
 ];
 
 async function unlock(page, code) {
@@ -29,7 +29,8 @@ async function openPicture(page, id) {
       window.__WCCA.board.picture &&
       window.__WCCA.board.picture.id === pictureId &&
       window.__WCCA.board.cssW > 100 &&
-      window.__WCCA.board.frameTimes.length > 0,
+      window.__WCCA.board.frameTimes.length > 0 &&
+      (!window.__WCCA.board.sourceInk || window.__WCCA.board.inkImage),
     id
   );
 }
@@ -61,7 +62,7 @@ test("quill scrolls stay paid, then color with the hand-inked lines", async ({ p
         title: board.picture.title,
         tier: board.picture.tier,
         regions: board.regions.length,
-        ink: Boolean(board.inkPath),
+        ink: Boolean(board.inkImage),
         colors: board.picture.palette.length,
         wide: board.worldW,
         tall: board.worldH,
@@ -109,13 +110,10 @@ test("quill scrolls stay paid, then color with the hand-inked lines", async ({ p
     await openPicture(page, id);
     await page.evaluate(() => {
       const board = window.__WCCA.board;
-      board.zoom = board.fitZoom * 2.4;
-      board.panX = board.cssW / 2 - (board.worldW * 0.42) * board.zoom;
-      board.panY = board.cssH / 2 - (board.worldH * 0.4) * board.zoom;
-      board.clampPan();
+      board.fit();
       board.draw();
     });
-    await page.screenshot({ path: path.join(shotDir, id + "-numbered.png") });
+    await page.locator("#board").screenshot({ path: path.join(shotDir, id + "-numbered.png") });
     await page.evaluate(() => {
       const board = window.__WCCA.board;
       board.fit();
@@ -131,6 +129,6 @@ test("quill scrolls stay paid, then color with the hand-inked lines", async ({ p
       board._paintLines();
       board.draw();
     });
-    await page.screenshot({ path: path.join(shotDir, id + "-partial.png") });
+    await page.locator("#board").screenshot({ path: path.join(shotDir, id + "-partial.png") });
   }
 });

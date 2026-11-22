@@ -169,10 +169,18 @@ export function writeInkPreview(traced, paint, palette, file, size = 360) {
       if (sx >= 0 && sy >= 0 && sx < w && sy < h) {
         const p = sy * w + sx;
         hex = "#fffdf8";
-        if (ink[p]) hex = "#1b2430";
-        else {
-          const c = paint[labels[p]];
-          if (Number.isInteger(c)) hex = palette[c].hex;
+        const c = paint[labels[p]];
+        if (Number.isInteger(c)) hex = palette[c].hex;
+        const a = traced.display ? traced.display[p] / 255 : ink[p] ? 1 : 0;
+        if (a > 0) {
+          const r = parseInt(hex.slice(1, 3), 16);
+          const g = parseInt(hex.slice(3, 5), 16);
+          const b = parseInt(hex.slice(5, 7), 16);
+          png.data[o] = Math.round(r * (1 - a));
+          png.data[o + 1] = Math.round(g * (1 - a));
+          png.data[o + 2] = Math.round(b * (1 - a));
+          png.data[o + 3] = 255;
+          continue;
         }
       }
       png.data[o] = parseInt(hex.slice(1, 3), 16);

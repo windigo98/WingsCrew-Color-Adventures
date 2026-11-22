@@ -254,7 +254,7 @@ for (const entry of QUILL) {
     inkPreview: { traced: built.traced, paint: built.colors, palette: entry.palette },
   });
   console.log(
-    `${built.picture.regions.length} regions, cov miss ${built.coverage.miss}/${built.coverage.total}, ink ${Math.round(built.inkPoints / 1024)}KB, ${Date.now() - t0}ms`
+    `${built.picture.regions.length} regions, cov miss ${built.coverage.miss}/${built.coverage.total}, ${Date.now() - t0}ms`
   );
 }
 

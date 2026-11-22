@@ -208,12 +208,37 @@ export class Board {
     }
     this.selected = best;
     this.inkPath = picture.ink ? new Path2D(picture.ink) : null;
+    this.sourceInk = Boolean(picture.inkPng);
+    this.inkImage = null;
+    this.inkReady = null;
+    if (picture.inkPng) {
+      const img = new Image();
+      this.inkReady = new Promise((resolve) => {
+        img.onload = () => {
+          this.inkImage = img;
+          this._paintLines();
+          this._paintCache();
+          this.rebuildHighlight();
+          this.draw();
+          resolve();
+        };
+        img.onerror = () => resolve();
+      });
+      img.src = "data:image/png;base64," + picture.inkPng;
+    }
     this._paintCache();
     this._paintLines();
     this.rebuildHighlight();
   }
 
   _paintInk(ctx, lineWidth) {
+    if (this.inkImage) {
+      ctx.save();
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(this.inkImage, 0, 0, this.worldW, this.worldH);
+      ctx.restore();
+      return;
+    }
     if (!this.inkPath) return;
     ctx.save();
     ctx.fillStyle = INK;
@@ -314,11 +339,13 @@ export class Board {
     const ctx = this.lctx;
     ctx.clearRect(0, 0, this.lines.width, this.lines.height);
     this._worldTransform(ctx, scale);
-    ctx.strokeStyle = INK;
-    ctx.lineJoin = "round";
-    ctx.lineCap = "round";
-    ctx.lineWidth = this.thickLines ? 2.8 : 1.7;
-    for (const r of this.regions) ctx.stroke(r.path);
+    if (!this.sourceInk) {
+      ctx.strokeStyle = INK;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      ctx.lineWidth = this.thickLines ? 2.8 : 1.7;
+      for (const r of this.regions) ctx.stroke(r.path);
+    }
     this._paintInk(ctx, this.thickLines ? 2.2 : 1.25);
   }
 
@@ -328,6 +355,7 @@ export class Board {
     const ctx = this.cctx;
     this._worldTransform(ctx, scale);
     this._fillRegion(ctx, r);
+    if (this.sourceInk) return;
     const lctx = this.lctx;
     this._worldTransform(lctx, scale);
     lctx.strokeStyle = INK;
@@ -550,11 +578,13 @@ export class Board {
       ctx.fillStyle = PAPER;
       ctx.fillRect(0, 0, this.worldW, this.worldH);
       for (const r of visible) this._fillRegion(ctx, r);
-      ctx.strokeStyle = INK;
-      ctx.lineJoin = "round";
-      ctx.lineCap = "round";
-      ctx.lineWidth = (this.thickLines ? 2.4 : 1.45) / this.zoom;
-      for (const r of visible) ctx.stroke(r.path);
+      if (!this.sourceInk) {
+        ctx.strokeStyle = INK;
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round";
+        ctx.lineWidth = (this.thickLines ? 2.4 : 1.45) / this.zoom;
+        for (const r of visible) ctx.stroke(r.path);
+      }
       if (this.highlight && this.selected != null) {
         const color = this.picture.palette[this.selected].hex;
         ctx.lineWidth = (this.thickLines ? 3.2 : 2.2) / this.zoom;
@@ -575,7 +605,7 @@ export class Board {
       ctx.drawImage(this.cache, this.panX, this.panY, this.worldW * this.zoom, this.worldH * this.zoom);
       ctx.drawImage(this.lines, this.panX, this.panY, this.worldW * this.zoom, this.worldH * this.zoom);
       if (this.highlight) ctx.drawImage(this.highlightLayer, this.panX, this.panY, this.worldW * this.zoom, this.worldH * this.zoom);
-      if (this.inkPath) {
+      if (this.inkPath && !this.sourceInk) {
         ctx.save();
         ctx.translate(this.panX, this.panY);
         ctx.scale(this.zoom, this.zoom);
@@ -625,10 +655,12 @@ export class Board {
       ctx.fillStyle = this.filled[r.i] ? this.styleOf(r) : "#fffdf8";
       ctx.fill(r.path, "evenodd");
     }
-    ctx.strokeStyle = INK;
-    ctx.lineJoin = "round";
-    ctx.lineWidth = this.thickLines ? 2.4 : 1.45;
-    for (const r of this.regions) ctx.stroke(r.path);
+    if (!this.sourceInk) {
+      ctx.strokeStyle = INK;
+      ctx.lineJoin = "round";
+      ctx.lineWidth = this.thickLines ? 2.4 : 1.45;
+      for (const r of this.regions) ctx.stroke(r.path);
+    }
     this._paintInk(ctx, this.thickLines ? 2.1 : 1.2);
     if (withNumbers) {
       ctx.fillStyle = INK;

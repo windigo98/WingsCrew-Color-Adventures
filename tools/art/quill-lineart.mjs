@@ -10,14 +10,14 @@ import { PNG } from "pngjs";
 import { vectorizeLabels } from "../../js/vectorize.js";
 import { pointInLoops, polylabel } from "../../js/geom.js";
 import { distancePoles } from "../lib/segment.mjs";
-import { traceAdult, colorAt, polesOf } from "../lib/adult-lineart.mjs";
+import { traceAdult, colorAt, polesOf, sourceInkAlpha } from "../lib/adult-lineart.mjs";
 import { coverage } from "../lib/coverage.mjs";
 
 const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), "lineart/quill");
 const swatch = (hex, name) => ({ hex, name });
 
 function page(def) {
-  return { pack: "quill", tier: "adult", rev: 1, close: 1, ...def };
+  return { pack: "quill", tier: "adult", rev: 2, close: 0, ...def };
 }
 
 const frame = (marginColor, colors, fallback, margin = 0.042, band = 0.118) => ({
@@ -94,7 +94,7 @@ export const QUILL = [
     zones: [
       { cx: 0.4, cy: 0.3, rx: 0.1, ry: 0.09, colors: [5, 6] },
       { cx: 0.36, cy: 0.28, rx: 0.025, ry: 0.02, colors: [10] },
-      { cx: 0.5, cy: 0.64, rx: 0.12, ry: 0.1, colors: [7, 8] },
+      { cx: 0.5, cy: 0.64, rx: 0.12, ry: 0.1, colors: [7] },
       { cx: 0.32, cy: 0.74, rx: 0.06, ry: 0.05, colors: [9, 10] },
       { cx: 0.62, cy: 0.76, rx: 0.06, ry: 0.05, colors: [9, 10] },
       { cx: 0.16, cy: 0.48, rx: 0.1, ry: 0.28, colors: [4, 5] },
@@ -111,6 +111,9 @@ export const QUILL = [
     file: "ocean.png",
     thresh: 200,
     minRadius: 2,
+    minCount: 250,
+    shortfall:
+      "Light hatching stays as the original thin strokes on top of larger regions, so this page counts only the cells the ink actually closes.",
     spark: { max: 18, from: 0, to: 2 },
     palette: [
       swatch("#8FD0E8", "Water"),
@@ -152,6 +155,9 @@ export const QUILL = [
     file: "butterflies.png",
     thresh: 170,
     minRadius: 2,
+    minCount: 250,
+    shortfall:
+      "Light hatching stays as the original thin strokes on top of larger regions, so this page counts only the cells the ink actually closes.",
     palette: [
       swatch("#EAF1FF", "Sky"),
       swatch("#7A6BB8", "Violet"),
@@ -401,11 +407,6 @@ export function vectorizeQuill(entry, traced, colors) {
     if (!pt) continue;
     regions.push({ c: colors[id], d: geom.path, x: pt.x, y: pt.y, loops: geom.loops });
   }
-  const inkLabels = new Int32Array(traced.w * traced.h);
-  inkLabels.fill(-1);
-  for (let i = 0; i < traced.ink.length; i++) if (traced.ink[i]) inkLabels[i] = 0;
-  const inkVec = vectorizeLabels(inkLabels, traced.w, traced.h, view, Math.min(used, 1.15));
-  const inkGeom = inkVec.get(0);
   const usedColors = [];
   const remap = new Map();
   for (const region of regions) {
@@ -422,20 +423,30 @@ export function vectorizeQuill(entry, traced, colors) {
     rev: entry.rev,
     viewBox: [0, 0, viewW, viewH],
     palette: usedColors,
-    ink: inkGeom ? inkGeom.path : "",
     regions: regions.map((region) => ({ c: region.c, d: region.d, x: region.x, y: region.y, loops: region.loops })),
   };
   if (regions.length < 800 && entry.shortfall) picture.note = entry.shortfall;
   const cov = coverage(picture.regions, 70, viewW, viewH);
-  return { picture, eps: used, vecCount: vec.size, coverage: cov, inkPoints: inkGeom ? inkGeom.path.length : 0 };
+  return { picture, eps: used, vecCount: vec.size, coverage: cov };
+}
+
+function sourceInkPng(png, alpha) {
+  const out = new PNG({ width: png.width, height: png.height });
+  for (let p = 0; p < alpha.length; p++) {
+    const o = p * 4;
+    out.data[o + 3] = alpha[p];
+  }
+  return PNG.sync.write(out);
 }
 
 export function buildQuill(entry, opt = {}) {
   const png = loadQuillPng(entry);
   const traced = traceAdult(png, entry);
+  traced.display = sourceInkAlpha(png);
   const colors = paintQuill(entry, traced);
   if (opt.traceOnly) return { traced, colors, picture: null };
   const drawn = vectorizeQuill(entry, traced, colors);
+  drawn.picture.inkPng = sourceInkPng(png, traced.display).toString("base64");
   return { traced, colors, ...drawn };
 }
 
@@ -450,15 +461,20 @@ function previewPng(traced, colors, palette, file) {
       const sx = Math.min(traced.w - 1, (x / scale) | 0);
       const p = sy * traced.w + sx;
       const o = (y * ow + x) * 4;
-      let hex = "#fffdf8";
-      if (traced.ink[p]) hex = "#1b2430";
-      else {
-        const c = colors[traced.labels[p]];
-        if (Number.isInteger(c)) hex = palette[c].hex;
+      let r = 255;
+      let g = 253;
+      let b = 248;
+      const c = colors[traced.labels[p]];
+      if (Number.isInteger(c)) {
+        const hex = palette[c].hex;
+        r = parseInt(hex.slice(1, 3), 16);
+        g = parseInt(hex.slice(3, 5), 16);
+        b = parseInt(hex.slice(5, 7), 16);
       }
-      png.data[o] = parseInt(hex.slice(1, 3), 16);
-      png.data[o + 1] = parseInt(hex.slice(3, 5), 16);
-      png.data[o + 2] = parseInt(hex.slice(5, 7), 16);
+      const a = traced.display ? traced.display[p] / 255 : traced.ink[p] ? 1 : 0;
+      png.data[o] = Math.round(r * (1 - a));
+      png.data[o + 1] = Math.round(g * (1 - a));
+      png.data[o + 2] = Math.round(b * (1 - a));
       png.data[o + 3] = 255;
     }
   }
@@ -478,7 +494,7 @@ if (isMain) {
     if (built.picture) {
       const cov = built.coverage;
       console.log(
-        `${built.picture.regions.length} regions (traced ${built.traced.count}, vec ${built.vecCount}) eps ${built.eps} miss ${cov.miss}/${cov.total} multi ${cov.multi} ink ${Math.round(built.inkPoints / 1024)}KB ${Date.now() - t0}ms`
+        `${built.picture.regions.length} regions (traced ${built.traced.count}, vec ${built.vecCount}) eps ${built.eps} miss ${cov.miss}/${cov.total} multi ${cov.multi} ${Date.now() - t0}ms`
       );
     } else {
       console.log(`${built.traced.count} regions ${Date.now() - t0}ms`);
