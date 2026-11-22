@@ -620,6 +620,96 @@
           "bytes": 163827
         }
       ]
+    },
+    {
+      "id": "quill",
+      "title": "Quill Scrolls",
+      "free": false,
+      "productId": "quill",
+      "tagline": "Eight hand-inked pages for a long, quiet color.",
+      "blurb": "A dragon and phoenix, a forest, a sea turtle, butterflies, a floating castle, a winter cabin, the sun and moon, and feathered wings.",
+      "pictures": [
+        {
+          "id": "dragon-phoenix",
+          "title": "Dragon and Phoenix",
+          "tier": "adult",
+          "regions": 894,
+          "colors": 15,
+          "file": "packs/quill/dragon-phoenix.json",
+          "preview": "packs/quill/previews/dragon-phoenix.png",
+          "bytes": 905807
+        },
+        {
+          "id": "forest-hollow",
+          "title": "Forest Hollow",
+          "tier": "adult",
+          "regions": 948,
+          "colors": 16,
+          "file": "packs/quill/forest-hollow.json",
+          "preview": "packs/quill/previews/forest-hollow.png",
+          "bytes": 1059963
+        },
+        {
+          "id": "turtle-tide",
+          "title": "Turtle Tide",
+          "tier": "adult",
+          "regions": 840,
+          "colors": 18,
+          "file": "packs/quill/turtle-tide.json",
+          "preview": "packs/quill/previews/turtle-tide.png",
+          "bytes": 731171
+        },
+        {
+          "id": "butterfly-garden",
+          "title": "Butterfly Garden",
+          "tier": "adult",
+          "regions": 866,
+          "colors": 15,
+          "file": "packs/quill/butterfly-garden.json",
+          "preview": "packs/quill/previews/butterfly-garden.png",
+          "bytes": 826123
+        },
+        {
+          "id": "floating-castle",
+          "title": "Floating Castle",
+          "tier": "adult",
+          "regions": 1094,
+          "colors": 15,
+          "file": "packs/quill/floating-castle.json",
+          "preview": "packs/quill/previews/floating-castle.png",
+          "bytes": 912203
+        },
+        {
+          "id": "winter-cabin",
+          "title": "Winter Cabin",
+          "tier": "adult",
+          "regions": 1008,
+          "colors": 15,
+          "file": "packs/quill/winter-cabin.json",
+          "preview": "packs/quill/previews/winter-cabin.png",
+          "bytes": 902683
+        },
+        {
+          "id": "sun-and-moon",
+          "title": "Sun and Moon",
+          "tier": "adult",
+          "regions": 335,
+          "colors": 14,
+          "file": "packs/quill/sun-and-moon.json",
+          "preview": "packs/quill/previews/sun-and-moon.png",
+          "bytes": 529883
+        },
+        {
+          "id": "feathered-wings",
+          "title": "Feathered Wings",
+          "tier": "adult",
+          "regions": 437,
+          "colors": 12,
+          "file": "packs/quill/feathered-wings.json",
+          "preview": "packs/quill/previews/feathered-wings.png",
+          "bytes": 587275
+        }
+      ]
     }
   ]
 }

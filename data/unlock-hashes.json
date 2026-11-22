@@ -10,7 +10,8 @@
     "all-future": "WCCA-PASS",
     "ocean": "WCCA-OCEA",
     "aboard": "WCCA-ABRD",
-    "lantern": "WCCA-LANT"
+    "lantern": "WCCA-LANT",
+    "quill": "WCCA-QUIL"
   },
   "hashes": {
     "full-unlock": [
@@ -282,6 +283,33 @@
       "74fca7f8dab6b1391f1299c7fed41ffe4e8d2e2d1f09724d2bfa705aaa4505ab",
       "473d93a4c93ab6ceed8952a89ef9a7826a2d22f6832ff4a03ecaf896fc216bd5",
       "4a1a7d71938698b7e9155410b4704763046f5bdc85e601bc0deb43376ab53c9d"
+    ],
+    "quill": [
+      "6357edc2a6f759fd1acb7a163be11474d22fb7d3cfe570445f3f8f6fb15d8ff2",
+      "1ce49274878712595a1bf6966f62ddf254d8503fd01fd9ee0d7ba55d4c1f7d35",
+      "f1bf7f9972f5d9eaf60787222782b182308e3975848d920a90c5c7d1d0e8fa2b",
+      "5bbf2548b4395015d74b8a375c0f1e8fbecf2544da44f698113fe3ed5aa63822",
+      "8bc897f811f4589f9355a515edced0c5c98500e72191b215a845361780bd6e3d",
+      "ebb7c86a24f70849d15d80dc4e7f981c2921f4aba55e097023934245661ddecc",
+      "eb4b62af018595821e84c0977c1f1e8b0d66caba6d414bf62e9fad29934501ac",
+      "4d5ee9994b99f442ac188ab379f0e70960df1b167d31f470ed33aa2a72cb680e",
+      "90ba442f74eee9295ea772a94f68ae915779aa9acbab11289a005bfd27f485c7",
+      "fe5813a26b634ef46d2701e1501d4de7e8364b64b8592258c6f15d9927136b8a",
+      "ea3c3fa3b216a7c9ab74f8fa111d0ed800f46ff9f872eaefaaf81a8b7b00aed2",
+      "8b4032bd0f5c2333f7b1d5b4d26d33b2cc842e0c104524ad02a74a6933d0e7bd",
+      "afde8eb6e2801eaca4865f9a60fe97e2c3e821ff81813fb241bdf3fd060e8445",
+      "0762a6c9f12ddd167b89c4b3f2e49d2bfc808ab8a5f209e2347a59cbf723eac4",
+      "60e5b946a7c89078150201c8c24f4e0223e37e22d2aa2f980f25260523f630ab",
+      "6c1461c5f2d5164aa962298c4e9077f3cd058f952cd763c30de4818871b952fd",
+      "70ebc167dbd9ce902bdbbea2e30187eaab060bc5ced9dfee1c8f49db0f174bf8",
+      "42eae8b55841562916c8b9eb0fa51941ed6ddaeb0a31c53703ddc51ddf78c89b",
+      "ae3482eb99b2c09b3ef09c1ce4da9de59c91ed7b08c809815e2cf495bef5b5a5",
+      "e4a09ebc4a941be8da012b05b67e66933e36b303786fe996626a6092930e37a0",
+      "531383d84bda0cebf48d8b8a7a067875f4deaea945178ed2e1a452192b9a68ce",
+      "ac7e9745befe8803d934398ab7ad03d78c8f3c0f07b50250586adf36d345e8c6",
+      "b1c0345bdffd019aaa31d8dac86dc3e2a173ed29fa99ae961cbeb82a4d6e7975",
+      "5667bd0c3c09dc5d9e606f1f48e5975e417ef6f7544df49683e0e7cb004aff3f",
+      "3da42b4a173d8a2e23a2045871c9bd9c360049a538fc7434e62b0a4dd7d82f14"
     ]
   },
   "note": "Hashes only. This stops casual copying, not a determined person."

@@ -157,17 +157,23 @@ export const CHRISTMAS = [
 export function writeInkPreview(traced, paint, palette, file, size = 360) {
   const { w, h, labels, ink } = traced;
   const png = new PNG({ width: size, height: size });
+  const scale = Math.min(size / w, size / h);
+  const ox = (size - w * scale) / 2;
+  const oy = (size - h * scale) / 2;
   for (let y = 0; y < size; y++) {
-    const sy = Math.min(h - 1, ((y * h) / size) | 0);
     for (let x = 0; x < size; x++) {
-      const sx = Math.min(w - 1, ((x * w) / size) | 0);
-      const p = sy * w + sx;
+      const sx = Math.floor((x - ox) / scale);
+      const sy = Math.floor((y - oy) / scale);
       const o = (y * size + x) * 4;
-      let hex = "#fffdf8";
-      if (ink[p]) hex = "#1b2430";
-      else {
-        const c = paint[labels[p]];
-        if (Number.isInteger(c)) hex = palette[c].hex;
+      let hex = "#f6f1e7";
+      if (sx >= 0 && sy >= 0 && sx < w && sy < h) {
+        const p = sy * w + sx;
+        hex = "#fffdf8";
+        if (ink[p]) hex = "#1b2430";
+        else {
+          const c = paint[labels[p]];
+          if (Number.isInteger(c)) hex = palette[c].hex;
+        }
       }
       png.data[o] = parseInt(hex.slice(1, 3), 16);
       png.data[o + 1] = parseInt(hex.slice(3, 5), 16);

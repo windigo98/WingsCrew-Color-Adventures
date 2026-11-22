@@ -115,11 +115,12 @@ export function toJSON(picture) {
     id: picture.id,
     title: picture.title,
     tier: picture.tier,
-    viewBox: [0, 0, 1000, 1000],
+    viewBox: picture.viewBox || [0, 0, 1000, 1000],
     palette: picture.palette,
     regions: picture.regions.map((r) => ({ c: r.c, d: r.d, x: r.x, y: r.y })),
   };
   if (picture.rev) json.rev = picture.rev;
   if (picture.ink) json.ink = picture.ink;
+  if (picture.note) json.note = picture.note;
   return json;
 }
