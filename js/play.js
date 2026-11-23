@@ -1,6 +1,7 @@
 import { app, TIER_LABEL, asset } from "./state.js";
 import { Board } from "./renderer.js";
 import { getProgress, saveProgress } from "./db.js";
+import { normalizeHex, paletteFor, shadeRow } from "./colors.js";
 
 export function progressFits(progress, picture) {
   if (!progress || !picture) return false;
@@ -22,6 +23,8 @@ let cursor = -1;
 let saveTimer = 0;
 let pictureMeta = null;
 let alive = false;
+let sheetIndex = null;
+let shadeBase = null;
 
 function tone(freq, dur = 0.08, gain = 0.035) {
   if (!app.settings.sound) return;
@@ -51,13 +54,15 @@ export async function openPlay(root, picture, meta) {
   undoStack = [];
   redoStack = [];
   cursor = -1;
+  sheetIndex = null;
+  shadeBase = null;
   root.innerHTML = `
-    <section class="play">
+    <section class="play" data-tier="${picture.tier}">
       <div class="playbar">
         <button type="button" data-act="back" aria-label="Back">Back</button>
         <div class="play-title">
           <strong>${escapeHtml(picture.title)}</strong>
-          <span>${TIER_LABEL[picture.tier] || ""} · <span id="play-count">0</span>/${picture.regions.length}</span>
+          <span>${TIER_LABEL[picture.tier] || ""} · <span id="play-count">0</span> / ${picture.regions.length}</span>
         </div>
         <div class="play-tools">
           <button type="button" data-act="undo" aria-label="Undo">Undo</button>
@@ -70,10 +75,11 @@ export async function openPlay(root, picture, meta) {
           ${picture.tier === "adult" ? `<button type="button" data-act="loupe" aria-pressed="${app.settings.loupe ? "true" : "false"}">Magnifier</button>` : ""}
         </div>
       </div>
-      <p class="play-hint" id="play-hint">Tap a color, then tap matching shapes. Pinch to zoom. Drag to move.</p>
+      <p class="play-hint" id="play-hint">Tap a number and pick its color, then tap matching shapes. Pinch to zoom. Drag to move.</p>
       <div class="stage">
         <canvas id="board" aria-label="Coloring page"></canvas>
         <canvas id="loupe" class="loupe" width="280" height="280" hidden aria-hidden="true"></canvas>
+        <div class="color-sheet" id="color-sheet" hidden role="dialog" aria-labelledby="color-sheet-title"></div>
       </div>
       <div class="palette" id="palette" role="listbox" aria-label="Colors"></div>
       <div class="complete" id="complete" hidden>
@@ -148,15 +154,124 @@ function renderPalette() {
     .map((color, i) => {
       const finished = total[i] > 0 && done[i] === total[i];
       const name = color.name ? escapeHtml(color.name) : "";
-      const label = `Color ${i + 1}${name ? ", " + name : ""}, ${done[i]} of ${total[i]}`;
-      return `<button type="button" class="swatch${i === board.selected ? " selected" : ""}${finished ? " done" : ""}" data-color="${i}" role="option" aria-selected="${i === board.selected}" aria-label="${label}">
-        <span class="chip${showPatterns ? ` pat pat-${patternId(i)}` : ""}" style="background-color:${color.hex}"></span>
+      const chosen = board.colorHex(i);
+      const preset = normalizeHex(color.hex);
+      const custom = preset && chosen !== preset;
+      const label = `Number ${i + 1}${name ? ", " + name : ""}, ${done[i]} of ${total[i]}. Choose a color.`;
+      return `<button type="button" class="swatch${i === board.selected ? " selected" : ""}${finished ? " done" : ""}${custom ? " custom" : ""}" data-color="${i}" role="option" aria-selected="${i === board.selected}" aria-expanded="${sheetIndex === i}" aria-haspopup="dialog" aria-label="${label}">
+        <span class="chip${showPatterns ? ` pat pat-${patternId(i)}` : ""}" style="background-color:${chosen}"></span>
         <span class="num">${i + 1}</span>
         ${showNames && name ? `<span class="swatch-name">${name}</span>` : ""}
         <span class="swatch-meta">${done[i]}/${total[i]}${finished ? " ✓" : ""}</span>
       </button>`;
     })
     .join("");
+}
+
+function renderSheet() {
+  const el = document.getElementById("color-sheet");
+  if (!el || !board) return;
+  if (sheetIndex == null) {
+    el.hidden = true;
+    el.innerHTML = "";
+    return;
+  }
+  const index = sheetIndex;
+  const preset = board.picture.palette[index];
+  const presetHex = normalizeHex(preset?.hex) || board.colorHex(index);
+  const current = board.colorHex(index);
+  const base = shadeBase || current;
+  const tier = pictureMeta?.tier || board.picture.tier;
+  const little = tier === "little";
+  const presetName = preset?.name ? escapeHtml(preset.name) : "";
+  const paints = paletteFor(tier);
+  const shades = shadeRow(base);
+  const on = (hex) => normalizeHex(hex) === current ? " on" : "";
+  const picks = paints
+    .map((paint) => `<button type="button" class="pick${on(paint.hex)}" data-pick="${paint.hex}" data-base="1" data-name="${escapeHtml(paint.name)}" aria-label="${escapeHtml(paint.name)}" style="background-color:${paint.hex}"></button>`)
+    .join("");
+  const shadeButtons = shades
+    .map((shade) => `<button type="button" class="shade${on(shade.hex)}" data-pick="${shade.hex}" aria-label="${escapeHtml(shade.name)} shade" style="background-color:${shade.hex}"></button>`)
+    .join("");
+  const pageColors = little
+    ? ""
+    : `<p class="shade-label">On this page</p>
+      <div class="page-row">
+        ${board.picture.palette.map((color, i) => {
+          const hex = normalizeHex(color.hex);
+          if (!hex) return "";
+          const name = color.name ? `, ${escapeHtml(color.name)}` : "";
+          return `<button type="button" class="mini-pick${on(hex)}" data-pick="${hex}" data-base="1" aria-label="Use number ${i + 1}${name}" style="background-color:${hex}"></button>`;
+        }).join("")}
+      </div>`;
+  const mixer = little
+    ? ""
+    : `<label class="mix">Mix your own <input type="color" id="mix-color" value="${current.toLowerCase()}" aria-label="Mix your own color"></label>`;
+  const sub = little
+    ? "Tap a color for this number."
+    : "Pick any color. Every shape with this number uses it.";
+  const focusPick = document.activeElement?.closest?.("#color-sheet [data-pick]")?.dataset.pick || "";
+  el.hidden = false;
+  el.innerHTML = `
+    <div class="color-sheet-head">
+      <h2 id="color-sheet-title">Number ${index + 1}</h2>
+      <button type="button" data-act="close-colors">Done</button>
+    </div>
+    <p class="sheet-sub">${sub}</p>
+    <button type="button" class="suggest${on(presetHex)}" data-pick="${presetHex}" data-base="1" aria-label="Suggested color${presetName ? " " + presetName : ""}">
+      <span class="chip" style="background-color:${presetHex}"></span>
+      <span>Suggested${presetName ? " · " + presetName : ""}</span>
+    </button>
+    <div class="pick-grid">${picks}</div>
+    <p class="shade-label">Shades</p>
+    <div class="shade-row">${shadeButtons}</div>
+    ${pageColors}
+    ${mixer}`;
+  if (focusPick) {
+    const again = [...el.querySelectorAll("[data-pick]")].find((node) => node.dataset.pick === focusPick);
+    again?.focus();
+  }
+}
+
+function openSheet(index) {
+  if (!board || !board.picture.palette[index]) return;
+  board.selected = index;
+  cursor = -1;
+  sheetIndex = index;
+  shadeBase = board.colorHex(index);
+  board.rebuildHighlight();
+  board.requestDraw();
+  renderPalette();
+  renderSheet();
+  document.querySelector(`.swatch[data-color="${index}"]`)?.scrollIntoView({ inline: "center", block: "nearest" });
+  document.querySelector("#color-sheet .suggest")?.focus();
+}
+
+function closeSheet() {
+  const index = sheetIndex;
+  sheetIndex = null;
+  shadeBase = null;
+  renderSheet();
+  renderPalette();
+  if (index != null) document.querySelector(`.swatch[data-color="${index}"]`)?.focus();
+}
+
+function applyPick(hex, resetBase) {
+  if (sheetIndex == null || !board) return;
+  const next = normalizeHex(hex);
+  if (!next) return;
+  if (resetBase) shadeBase = next;
+  const prev = board.colorHex(sheetIndex);
+  if (prev === next) {
+    if (resetBase) renderSheet();
+    return;
+  }
+  undoStack.push({ kind: "color", index: sheetIndex, hex: prev });
+  if (undoStack.length > 400) undoStack.shift();
+  redoStack.length = 0;
+  board.setSlotColor(sheetIndex, next);
+  tone(620, 0.05);
+  afterFill(pictureMeta);
 }
 
 function updateCount() {
@@ -186,11 +301,13 @@ function flashColor(index) {
   const btn = document.querySelector(`.swatch[data-color="${index}"]`);
   if (!btn) return;
   btn.classList.add("flash");
+  btn.scrollIntoView({ inline: "center", block: "nearest" });
   setTimeout(() => btn.classList.remove("flash"), 450);
 }
 
 function afterFill(meta) {
   renderPalette();
+  if (sheetIndex != null) renderSheet();
   updateCount();
   scheduleSave(meta);
   if (board.isComplete()) {
@@ -206,9 +323,14 @@ function doFill(index, meta, shadeValue = 0) {
   if (!region) return;
   if (board.filled[index] && !shadeValue) {
     board.selected = region.c;
+    if (sheetIndex != null && sheetIndex !== region.c) {
+      sheetIndex = region.c;
+      shadeBase = board.colorHex(region.c);
+    }
     board.rebuildHighlight();
     board.requestDraw();
     renderPalette();
+    if (sheetIndex != null) renderSheet();
     return;
   }
   if (region.c !== board.selected && !board.filled[index]) {
@@ -233,6 +355,14 @@ function doFill(index, meta, shadeValue = 0) {
 function undo(meta) {
   const step = undoStack.pop();
   if (!step) return;
+  if (step.kind === "color") {
+    const current = board.colorHex(step.index);
+    redoStack.push({ kind: "color", index: step.index, hex: current });
+    if (sheetIndex === step.index) shadeBase = step.hex;
+    board.setSlotColor(step.index, step.hex);
+    afterFill(meta);
+    return;
+  }
   redoStack.push({ i: step.i, filled: board.filled[step.i], shade: board.shades[step.i] });
   board.filled[step.i] = step.filled;
   board.shades[step.i] = step.shade;
@@ -247,6 +377,14 @@ function undo(meta) {
 function redo(meta) {
   const step = redoStack.pop();
   if (!step) return;
+  if (step.kind === "color") {
+    const current = board.colorHex(step.index);
+    undoStack.push({ kind: "color", index: step.index, hex: current });
+    if (sheetIndex === step.index) shadeBase = step.hex;
+    board.setSlotColor(step.index, step.hex);
+    afterFill(meta);
+    return;
+  }
   undoStack.push({ i: step.i, filled: board.filled[step.i], shade: board.shades[step.i] });
   board.filled[step.i] = step.filled;
   board.shades[step.i] = step.shade;
@@ -391,13 +529,16 @@ function bindPlay(root, picture, meta) {
   };
 
   const onClick = (e) => {
+    const pick = e.target.closest("[data-pick]");
+    if (pick) {
+      applyPick(pick.dataset.pick, pick.dataset.base === "1");
+      return;
+    }
     const colorBtn = e.target.closest("[data-color]");
     if (colorBtn) {
-      board.selected = +colorBtn.dataset.color;
-      cursor = -1;
-      board.rebuildHighlight();
-      board.requestDraw();
-      renderPalette();
+      const index = +colorBtn.dataset.color;
+      if (sheetIndex === index) closeSheet();
+      else openSheet(index);
       return;
     }
     const act = e.target.closest("[data-act]")?.dataset.act;
@@ -435,12 +576,23 @@ function bindPlay(root, picture, meta) {
     if (act === "save") savePng();
     if (act === "print") printPage();
     if (act === "close-complete") document.getElementById("complete").hidden = true;
+    if (act === "close-colors") closeSheet();
   };
   root.addEventListener("click", onClick);
+  const onMix = (e) => {
+    if (e.target.id !== "mix-color") return;
+    applyPick(e.target.value, true);
+  };
+  root.addEventListener("change", onMix);
 
   window.addEventListener("keydown", onKey);
   function onKey(e) {
     if (!alive) return;
+    if (e.key === "Escape" && sheetIndex != null) {
+      e.preventDefault();
+      closeSheet();
+      return;
+    }
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z") {
       e.preventDefault();
       if (e.shiftKey) redo(meta);
@@ -584,8 +736,11 @@ function bindPlay(root, picture, meta) {
   ro.observe(canvas.parentElement);
   root._cleanup = () => {
     alive = false;
+    sheetIndex = null;
+    shadeBase = null;
     ro.disconnect();
     root.removeEventListener("click", onClick);
+    root.removeEventListener("change", onMix);
     window.removeEventListener("keydown", onKey);
     clearTimeout(saveTimer);
     if (loupeRaf) cancelAnimationFrame(loupeRaf);

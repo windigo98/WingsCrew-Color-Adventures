@@ -1,4 +1,4 @@
-const CACHE = "wcca-v7";
+const CACHE = "wcca-v8";
 
 const SHELL = [
   "./",
@@ -17,6 +17,7 @@ const SHELL = [
   "./js/photo-worker.js",
   "./js/gate.js",
   "./js/backup.js",
+  "./js/colors.js",
   "./js/vectorize.js",
   "./js/geom.js",
   "./js/aids.js",
