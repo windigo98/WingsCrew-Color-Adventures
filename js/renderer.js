@@ -1,4 +1,5 @@
 import { numberStyle, patternId } from "./aids.js";
+import { normalizeHex } from "./colors.js";
 
 const PAPER = "#fbf7ef";
 const INK = "#1b2430";
@@ -166,6 +167,7 @@ export class Board {
 
   load(picture) {
     this.picture = picture;
+    this.resetColors();
     const box = picture.viewBox;
     this.worldW = box && box.length >= 4 ? box[2] - box[0] || 1000 : 1000;
     this.worldH = box && box.length >= 4 ? box[3] - box[1] || 1000 : 1000;
@@ -278,8 +280,30 @@ export class Board {
     return this.cacheSize / Math.max(this.worldW, this.worldH);
   }
 
+  colorHex(index) {
+    const chosen = this.colors && this.colors[index];
+    if (chosen) return chosen;
+    return normalizeHex(this.picture?.palette?.[index]?.hex) || "#888888";
+  }
+
+  resetColors() {
+    const palette = this.picture?.palette || [];
+    this.colors = palette.map((color) => normalizeHex(color.hex) || "#888888");
+  }
+
+  setSlotColor(index, hex) {
+    const next = normalizeHex(hex);
+    if (!next || !this.colors || index < 0 || index >= this.colors.length) return false;
+    if (this.colors[index] === next) return false;
+    this.colors[index] = next;
+    this._paintCache();
+    this.rebuildHighlight();
+    this.requestDraw();
+    return true;
+  }
+
   styleOf(region) {
-    const hex = this.picture.palette[region.c].hex;
+    const hex = this.colorHex(region.c);
     const shade = this.shades[region.i] / 255;
     return shade ? shadeHex(hex, shade) : hex;
   }
@@ -370,7 +394,7 @@ export class Board {
     const ctx = this.hctx;
     ctx.clearRect(0, 0, this.highlightLayer.width, this.highlightLayer.height);
     if (!this.highlight || this.selected == null) return;
-    const color = this.picture.palette[this.selected]?.hex;
+    const color = this.colorHex(this.selected);
     if (!color) return;
     this._worldTransform(ctx, scale);
     ctx.fillStyle = color;
@@ -586,7 +610,7 @@ export class Board {
         for (const r of visible) ctx.stroke(r.path);
       }
       if (this.highlight && this.selected != null) {
-        const color = this.picture.palette[this.selected].hex;
+        const color = this.colorHex(this.selected);
         ctx.lineWidth = (this.thickLines ? 3.2 : 2.2) / this.zoom;
         for (const r of visible) {
           if (r.c !== this.selected || this.filled[r.i]) continue;
@@ -680,6 +704,13 @@ export class Board {
   applyState(progress) {
     this.filled.fill(0);
     this.shades.fill(0);
+    this.resetColors();
+    if (progress && Array.isArray(progress.colors)) {
+      for (let i = 0; i < this.colors.length && i < progress.colors.length; i++) {
+        const next = normalizeHex(progress.colors[i]);
+        if (next) this.colors[i] = next;
+      }
+    }
     if (!progress) {
       this._paintCache();
       this.rebuildHighlight();
@@ -702,6 +733,6 @@ export class Board {
     const shades = {};
     for (let i = 0; i < this.filled.length; i++) if (this.filled[i]) filled.push(i);
     for (let i = 0; i < this.shades.length; i++) if (this.shades[i]) shades[i] = this.shades[i];
-    return { filled, shades, selected: this.selected };
+    return { filled, shades, selected: this.selected, colors: (this.colors || []).slice() };
   }
 }
