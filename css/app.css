@@ -246,8 +246,8 @@ body.playing #screen { height: 100dvh; max-height: 100dvh; overflow: hidden; }
   border-bottom: 1px solid var(--line);
 }
 .play-title { min-width: 0; }
-.play-title strong, .play-title span { display: block; }
-.play-title span { color: var(--muted); font-size: 0.82rem; }
+.play-title > strong, .play-title > span { display: block; }
+.play-title > span { color: var(--muted); font-size: 0.82rem; white-space: nowrap; }
 .play-tools { margin-left: auto; display: flex; flex-wrap: wrap; gap: 0.3rem; justify-content: flex-end; }
 .play-tools button, .playbar > button { padding: 0.4rem 0.7rem; }
 .play-tools button[aria-pressed="true"] { background: var(--orange); color: #fffaf3; }
@@ -302,7 +302,7 @@ body.playing #screen { height: 100dvh; max-height: 100dvh; overflow: hidden; }
   box-shadow: 0 10px 24px rgba(27, 36, 48, 0.28);
 }
 .swatch.selected { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(226, 91, 26, 0.35); }
-.swatch.done { opacity: 0.55; }
+.swatch.done .swatch-meta { font-weight: 700; }
 .swatch.flash { animation: pop 0.45s ease; }
 .play[data-tier="little"] .swatch { min-width: 84px; min-height: 78px; }
 .play[data-tier="little"] .swatch .num { font-size: 1.35rem; }

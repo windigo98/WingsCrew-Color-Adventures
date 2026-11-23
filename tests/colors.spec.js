@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
+import { PNG } from "pngjs";
 import {
   littlePalette,
   luminance,
@@ -128,6 +129,22 @@ function expectRgb(sampleResult, hex) {
   sampleResult.rgb.forEach((channel, i) => expect(Math.abs(channel - want[i])).toBeLessThanOrEqual(2));
 }
 
+async function centerRgb(locator) {
+  const png = PNG.sync.read(await locator.screenshot());
+  const x = Math.min(png.width - 1, Math.max(0, Math.round(png.width / 2)));
+  const y = Math.min(png.height - 1, Math.max(0, Math.round(png.height / 2)));
+  const i = (y * png.width + x) * 4;
+  return [png.data[i], png.data[i + 1], png.data[i + 2]];
+}
+
+async function expectStatusLine(page, label) {
+  const status = page.locator(".play-title > span");
+  const text = (await status.innerText()).replace(/\s+/g, " ").trim();
+  expect(text).toMatch(new RegExp(`^${label} · \\d+ / \\d+$`));
+  const box = await status.boundingBox();
+  expect(box.height).toBeLessThan(24);
+}
+
 async function shot(page, name) {
   fs.mkdirSync(artDir, { recursive: true });
   fs.mkdirSync(shotDir, { recursive: true });
@@ -203,6 +220,14 @@ test("each number keeps a chosen color, including after a reload", async ({ page
     board.gesturing = false;
     board.draw();
   });
+  const slot = page.locator('.swatch[data-color="0"]');
+  await expect(slot).toHaveClass(/done/);
+  expect(await slot.evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
+  const slotRgb = await centerRgb(slot.locator(".chip"));
+  const shadeRgb = await centerRgb(sheet.locator(".shade.on"));
+  slotRgb.forEach((channel, i) => expect(Math.abs(channel - shadeRgb[i])).toBeLessThanOrEqual(2));
+  rgbOf("#3A78D6").forEach((channel, i) => expect(Math.abs(slotRgb[i] - channel)).toBeLessThanOrEqual(2));
+  await expectStatusLine(page, "Little Kids");
   await shot(page, "ipad-little-kids.png");
   await page.evaluate((index) => {
     const board = window.__WCCA.board;
@@ -265,6 +290,7 @@ test("each number keeps a chosen color, including after a reload", async ({ page
   await expect(sheet.getByText("On this page")).toBeVisible();
   const adultPick = await sheet.locator(".pick").first().boundingBox();
   expect(Math.min(adultPick.width, adultPick.height)).toBeGreaterThanOrEqual(44);
+  await expectStatusLine(page, "Adults");
   await shot(page, "ipad-palette-open.png");
   await sheet.locator("#mix-color").scrollIntoViewIfNeeded();
   await expect(sheet.locator("#mix-color")).toBeVisible();
@@ -337,6 +363,7 @@ test("each number keeps a chosen color, including after a reload", async ({ page
   expect(colored.filled).toBeGreaterThan(20);
   expect(colored.filled).toBeLessThan(colored.total);
   expect(colored.custom).toBeGreaterThan(3);
+  await expectStatusLine(page, "Adults");
   await shot(page, "ipad-adult-custom-colors.png");
 
   await page.getByRole("button", { name: "Highlight" }).click();

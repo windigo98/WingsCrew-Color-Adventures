@@ -62,7 +62,7 @@ export async function openPlay(root, picture, meta) {
         <button type="button" data-act="back" aria-label="Back">Back</button>
         <div class="play-title">
           <strong>${escapeHtml(picture.title)}</strong>
-          <span>${TIER_LABEL[picture.tier] || ""} · <span id="play-count">0</span>/${picture.regions.length}</span>
+          <span>${TIER_LABEL[picture.tier] || ""} · <span id="play-count">0</span> / ${picture.regions.length}</span>
         </div>
         <div class="play-tools">
           <button type="button" data-act="undo" aria-label="Undo">Undo</button>
