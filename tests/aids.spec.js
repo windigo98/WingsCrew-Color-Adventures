@@ -162,8 +162,8 @@ test("home hint, backup gate, magnifier, and easier seeing", async ({ page }, te
     const open = board.regions.find((item) => !board.filled[item.i]) || region;
     const patch = () => {
       const cache = board.cache;
-      const x = Math.max(0, Math.round((open.x / 1000) * cache.width) - 12);
-      const y = Math.max(0, Math.round((open.y / 1000) * cache.height) - 12);
+      const x = Math.max(0, Math.round((open.x / board.worldW) * cache.width) - 12);
+      const y = Math.max(0, Math.round((open.y / board.worldH) * cache.height) - 12);
       return cache.getContext("2d").getImageData(x, y, 24, 24).data;
     };
     board.patterns = false;

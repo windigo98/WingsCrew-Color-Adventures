@@ -5,6 +5,7 @@ import { PICTURES } from "./art/scenes.mjs";
 import { mandalaEntries, buildMandala } from "./art/mandalas.mjs";
 import { CHRISTMAS, buildChristmas, writeInkPreview } from "./art/christmas-lineart.mjs";
 import { QUILL, buildQuill } from "./art/quill-lineart.mjs";
+import { IMAGINE, buildImagine } from "./art/imagine-lineart.mjs";
 import { vectorizePainted, toJSON } from "./lib/picture.mjs";
 import { coverage } from "./lib/coverage.mjs";
 import { obfuscate } from "./lib/crypt.mjs";
@@ -104,6 +105,33 @@ function writePNG(file, size, paint) {
 
 function hexToRgb(hex) {
   return [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
+}
+
+function previewPortrait(traced, paint, palette, file) {
+  const w = 384;
+  const h = Math.round((w * traced.h) / traced.w);
+  const png = new PNG({ width: w, height: h });
+  for (let y = 0; y < h; y++) {
+    const sy = Math.min(traced.h - 1, ((y * traced.h) / h) | 0);
+    for (let x = 0; x < w; x++) {
+      const sx = Math.min(traced.w - 1, ((x * traced.w) / w) | 0);
+      const p = sy * traced.w + sx;
+      const o = (y * w + x) * 4;
+      let hex = "#fffdf8";
+      const c = paint[traced.labels[p]];
+      if (Number.isInteger(c)) hex = palette[c].hex;
+      const a = traced.display ? traced.display[p] / 255 : traced.ink[p] ? 1 : 0;
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      png.data[o] = Math.round(r * (1 - a));
+      png.data[o + 1] = Math.round(g * (1 - a));
+      png.data[o + 2] = Math.round(b * (1 - a));
+      png.data[o + 3] = 255;
+    }
+  }
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, PNG.sync.write(png));
 }
 
 function previewFromLabels(picture, file) {
@@ -209,10 +237,13 @@ function assertPicture(meta, picture, cov) {
   }
 }
 
+const RASTER_PACKS = new Set(["starter", "ocean", "creatures", "halloween", "aboard", "mandalas", "lantern"]);
+
 const pictures = [];
 const filter = only && only !== "all" ? only : null;
 
 for (const entry of PICTURES) {
+  if (RASTER_PACKS.has(entry.pack)) continue;
   if (filter && entry.id !== filter && entry.pack !== filter) continue;
   const t0 = Date.now();
   process.stdout.write(`paint ${entry.id}… `);
@@ -259,6 +290,7 @@ for (const entry of QUILL) {
 }
 
 for (const entry of mandalaEntries()) {
+  if (RASTER_PACKS.has(entry.pack)) continue;
   if (filter && entry.id !== filter && entry.pack !== filter) continue;
   const t0 = Date.now();
   process.stdout.write(`mandala ${entry.id}… `);
@@ -269,8 +301,33 @@ for (const entry of mandalaEntries()) {
   console.log(`${picture.regions.length} regions, cov miss ${cov.miss}/${cov.total}, ${Date.now() - t0}ms`);
 }
 
+for (const entry of IMAGINE) {
+  if (filter && entry.id !== filter && entry.pack !== filter) continue;
+  const t0 = Date.now();
+  process.stdout.write(`imagine ${entry.id}… `);
+  const built = buildImagine(entry);
+  const box = built.picture.viewBox;
+  const cov = coverage(built.picture.regions, entry.tier === "adult" ? 80 : 120, box[2], box[3]);
+  assertPicture(entry, built.picture, cov);
+  const n = built.picture.regions.length;
+  if (entry.tier === "big" && n < 120 && n >= 60) {
+    console.log(`     below target ${entry.id}: ${n} regions (hard range 60-250, target 120-200)`);
+  }
+  if (built.picture.note) console.log(`     SHORTFALL ${entry.id}: ${n} regions. ${built.picture.note}`);
+  pictures.push({
+    entry,
+    picture: built.picture,
+    cov,
+    ms: Date.now() - t0,
+    inkPreview: { traced: built.traced, paint: built.colors, palette: entry.palette, portrait: true },
+  });
+  console.log(`${n} regions, cov miss ${cov.miss}/${cov.total}, ${Date.now() - t0}ms`);
+}
+
 if (!filter) {
-  const expected = PICTURES.length + mandalaEntries().length + CHRISTMAS.length + QUILL.length;
+  const vectorCount = PICTURES.filter((entry) => !RASTER_PACKS.has(entry.pack)).length;
+  const mandalaCount = mandalaEntries().filter((entry) => !RASTER_PACKS.has(entry.pack)).length;
+  const expected = vectorCount + mandalaCount + CHRISTMAS.length + QUILL.length + IMAGINE.length;
   if (pictures.length !== expected) throw new Error(`generated ${pictures.length}, expected ${expected}`);
 }
 
@@ -293,7 +350,9 @@ for (const item of pictures) {
     fs.writeFileSync(path.join(dir, fileName), body);
   }
   const preview = path.join(dir, "previews", `${item.entry.id}.png`);
-  if (item.inkPreview) writeInkPreview(item.inkPreview.traced, item.inkPreview.paint, item.inkPreview.palette, preview);
+  if (item.inkPreview?.portrait) {
+    previewPortrait(item.inkPreview.traced, item.inkPreview.paint, item.inkPreview.palette, preview);
+  } else if (item.inkPreview) writeInkPreview(item.inkPreview.traced, item.inkPreview.paint, item.inkPreview.palette, preview);
   else if (item.picture.labels) previewFromLabels(item.picture, preview);
   else previewFromRegions(item.picture, preview);
   byPack.get(item.entry.pack).push({
@@ -309,7 +368,7 @@ for (const item of pictures) {
   console.log(`  wrote ${item.entry.pack}/${fileName} (${(Buffer.byteLength(body) / 1024).toFixed(0)} KB json)`);
 }
 
-if (filter === "christmas" || filter === "quill") {
+if (filter && PACKS.some((pack) => pack.id === filter)) {
   const catalog = JSON.parse(fs.readFileSync(path.join(root, "packs/catalog.json"), "utf8"));
   const byId = new Map(catalog.packs.map((pack) => [pack.id, pack]));
   for (const pack of PACKS) {

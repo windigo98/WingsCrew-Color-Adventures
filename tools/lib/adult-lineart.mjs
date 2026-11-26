@@ -242,7 +242,7 @@ function neighborEdges(labels, count, w, h) {
   return edges;
 }
 
-function mergeSmall(count, areaIn, radiusIn, edges, minRadius) {
+function mergeSmall(count, areaIn, radiusIn, edges, minRadius, maxRegions = 0) {
   const parent = new Int32Array(count);
   const area = Int32Array.from(areaIn);
   const radius = Int32Array.from(radiusIn);
@@ -323,8 +323,9 @@ function mergeSmall(count, areaIn, radiusIn, edges, minRadius) {
       if (!fails(i)) continue;
       if (pick < 0 || area[i] < area[pick]) pick = i;
     }
-    if (live <= 2800 && pick < 0) break;
-    if (pick < 0 && live > 2600) {
+    if (pick < 0) {
+      const overCap = maxRegions > 0 ? live > maxRegions : live > 2800;
+      if (!overCap) break;
       for (let i = 0; i < count; i++) {
         if (find(i) !== i || area[i] === 0) continue;
         if (pick < 0 || area[i] < area[pick]) pick = i;
@@ -421,10 +422,23 @@ export function sourceInkAlpha(png) {
   return alpha;
 }
 
+/** Big-kid pages: same closed-cell trace as adults, then merge down toward ~200. */
+export const MID_DEFAULTS = {
+  thresh: 190,
+  close: 1,
+  minRadius: 2,
+  maxRegions: 200,
+};
+
+export function traceMid(png, opt = {}) {
+  return traceAdult(png, { ...MID_DEFAULTS, ...opt });
+}
+
 export function traceAdult(png, opt = {}) {
   const thresh = opt.thresh ?? 160;
   const close = opt.close ?? 1;
   const minRadius = opt.minRadius ?? 3;
+  const maxRegions = opt.maxRegions ?? 0;
   const w = png.width;
   const h = png.height;
   const ink = rasterInk(png, thresh);
@@ -432,7 +446,7 @@ export function traceAdult(png, opt = {}) {
   const flooded = floodPaper(ink, w, h);
   const kept = absorbPinholes(flooded.labels, ink, flooded.count, w, h);
   const edges = neighborEdges(kept.labels, kept.count, w, h);
-  const merged = mergeSmall(kept.count, kept.area, kept.radius, edges, minRadius);
+  const merged = mergeSmall(kept.count, kept.area, kept.radius, edges, minRadius, maxRegions);
   const remapped = remap(kept.labels, merged.find, kept.count);
   const inkCopy = ink.slice();
   assignInk(remapped.labels, w, h);
