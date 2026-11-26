@@ -482,7 +482,7 @@ export class Board {
 
   hitTest(sx, sy) {
     const [wx, wy] = this.screenToWorld(sx, sy);
-    if (wx < -2 || wy < -2 || wx > 1002 || wy > 1002) return -1;
+    if (wx < -2 || wy < -2 || wx > this.worldW + 2 || wy > this.worldH + 2) return -1;
     const cell = this.cell;
     const bucket = this.grid.get(Math.floor(wx / cell) + "," + Math.floor(wy / cell)) || [];
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -685,7 +685,8 @@ export class Board {
       this.rebuildHighlight();
       return;
     }
-    for (const i of progress.filled || []) if (i >= 0 && i < this.filled.length) this.filled[i] = 1;
+    const filled = Array.isArray(progress.filled) ? progress.filled : [];
+    for (const i of filled) if (i >= 0 && i < this.filled.length) this.filled[i] = 1;
     if (progress.shades) {
       for (const [k, v] of Object.entries(progress.shades)) {
         const i = +k;

@@ -7,6 +7,7 @@ export function progressFits(progress, picture) {
   const count = picture.regions.length;
   if (picture.rev && progress.rev && progress.rev !== picture.rev) return false;
   if (Number.isInteger(progress.total) && progress.total !== count) return false;
+  if (progress.filled != null && !Array.isArray(progress.filled)) return false;
   for (const index of progress.filled || []) {
     if (!Number.isInteger(index) || index < 0 || index >= count) return false;
   }

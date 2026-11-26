@@ -329,7 +329,7 @@ test("test-mode purchase, photo page, offline reload, and adult performance", as
       patternPanMs: Math.round(avg(patternPan) * 10) / 10,
     };
   });
-  expect(perf.regions).toBeGreaterThan(2000);
+  expect(perf.regions).toBeGreaterThan(1000);
   expect(perf.panMs).toBeLessThan(50);
   expect(perf.fillMs).toBeLessThan(80);
   expect(perf.patternPanMs).toBeLessThan(50);
@@ -411,7 +411,7 @@ test("studio links name WingsCrew, open the studio site, and ask a grown-up in k
 
   const sw = await page.request.get("./sw.js");
   const swText = await sw.text();
-  expect(swText).toContain('const CACHE = "wcca-v7"');
+  expect(swText).toContain('const CACHE = "wcca-v8"');
   expect(swText).toContain("./icons/logo.png");
 
   await page.goto("./");

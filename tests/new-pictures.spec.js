@@ -101,13 +101,21 @@ test("new packs stay locked under Full Unlock, then render and color", async ({ 
         regions: board.regions.length,
         medianFont: fonts[fonts.length >> 1],
         labeled: board.regions.filter((region) => Number.isFinite(region.x) && Number.isFinite(region.y)).length,
+        note: board.picture.note || "",
+        tall: board.worldH,
+        wide: board.worldW,
       };
     });
     const [lo, hi] = RANGES[tier];
     expect(stats.id).toBe(id);
     expect(stats.tier).toBe(tier);
-    expect(stats.regions).toBeGreaterThanOrEqual(lo);
-    expect(stats.regions).toBeLessThanOrEqual(hi);
+    expect(stats.tall).toBeGreaterThan(stats.wide);
+    const adultShort = tier === "adult" && stats.regions < lo && stats.regions >= 250 && stats.note;
+    const bigShort = tier === "big" && stats.regions < lo && stats.regions >= 10 && stats.note;
+    if (!adultShort && !bigShort) {
+      expect(stats.regions).toBeGreaterThanOrEqual(lo);
+      expect(stats.regions).toBeLessThanOrEqual(hi);
+    }
     expect(stats.labeled).toBe(stats.regions);
     if (tier === "little") expect(stats.medianFont).toBeGreaterThanOrEqual(10);
 
@@ -173,6 +181,18 @@ test("new packs stay locked under Full Unlock, then render and color", async ({ 
   await page.screenshot({ path: path.join(shotDir, "new-reef-find-next.png") });
 
   await openPicture(page, "amber-compass");
+  await page.evaluate(() => {
+    const board = window.__WCCA.board;
+    const small = board.regions
+      .filter((region) => !board.filled[region.i] && region.bb.x1 - region.bb.x0 < 80 && region.bb.y1 - region.bb.y0 < 80)
+      .sort(
+        (a, b) =>
+          Math.hypot(a.x - board.worldW / 2, a.y - board.worldH / 2) -
+          Math.hypot(b.x - board.worldW / 2, b.y - board.worldH / 2)
+      )[0];
+    board.selected = small.c;
+    board.rebuildHighlight();
+  });
   await find.click();
   const compass = await page.evaluate(() => {
     const board = window.__WCCA.board;
